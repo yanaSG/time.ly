@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
-import MainInput from '../../components/ui/inputs/MainInput'
-import MainButton from '../../components/ui/buttons/MainButton'
+import AuthInput from '../../components/ui/inputs/AuthInput'
+import AuthButton from '../../components/ui/buttons/AuthButton'
 import { useAuth } from '../../../hooks/useAuth';
+import { FaRegUser } from "react-icons/fa6";
+import { CgPassword } from "react-icons/cg";
 
 interface LoginForm {
   username: string;
@@ -50,31 +52,31 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className='flex flex-col gap-3 justify-center items-center'>
-      <h3 className='text-xl text-zinc-900 font-bold'>Welcome back!</h3>
-      <p className='text-gray-600 text-sm mb-2'>Please enter your details to sign in your account</p>
+    <div className='max-h-max max-w-max flex flex-col gap-3 md:m-20 justify-center md:items-start items-center text-[#5A5A5A]'>
+      <h3 className='text-3xl font-extrabold'>Log In Your Account</h3>
+      <p className='text-sm font-medium mb-2'>Upload. Generate. Conquer.</p>
       {error && <p className='text-red-500 text-sm font-medium'>{error}</p>}
-      <form onSubmit={handleSubmit} className='flex flex-col gap-3'>
-        <MainInput 
-          label='Username' 
+      <form onSubmit={handleSubmit} className='w-full flex flex-col gap-3 my-4 md:items-start items-center'>
+        <AuthInput 
           type='text' 
-          placeholder='Enter your username' 
-          className='w-sm' 
+          placeholder='Username' 
+          icon={<FaRegUser className='size-5 opacity-50' />}
+          className='lg:w-sm' 
           value={formData.username} 
           onChange={(e) => setFormData({ ...formData, username: e.target.value })}
         />
-        <MainInput 
-          label='Password' 
+        <AuthInput 
           type='password' 
-          placeholder='Enter your Password' 
-          className='w-sm' 
+          placeholder='Password' 
+          icon={<CgPassword className='size-5 opacity-50' />}
+          className='lg:w-sm' 
           value={formData.password} 
           onChange={(e) => setFormData({ ...formData, password: e.target.value })}
         />
-        <MainButton label='Sign In' type='submit' className='w-xs' />
+        <AuthButton label='LOG IN' type='submit' className='mt-5' />
       </form>
-      <p className='text-zinc-500 text-sm'>Don't have an account? <a href="/register"className='text-zinc-800 font-medium hover:underline'>Sign up here</a></p>
-      <a href="#" className='font-medium text-sm hover:underline hover:text-zinc-800'>Forgot your Password?</a>
+      <p className='text-sm'>Don't have an account? <a href="/register"className='text-[#D05C28] font-semibold hover:underline'>Sign up here</a></p>
+      <a href="#" className='font-medium text-sm hover:underline hover:text-[#D05C28]'>Forgot your Password?</a>
     </div>
   )
 }
