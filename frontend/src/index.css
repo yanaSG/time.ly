@@ -1,1 +1,6 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,600,700');
 @import "tailwindcss";
+
+body {
+    font-family: 'Poppins';
+}
