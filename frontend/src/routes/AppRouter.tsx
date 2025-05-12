@@ -1,12 +1,12 @@
-import { Fragment, Suspense, lazy } from "react";
+import React, { Fragment, Suspense, lazy } from "react";
 import { useRoutes } from "react-router-dom";
 import { ROUTES } from "./routes";
-import LoadingSpinner from "../components/ui/LoadingSpinner";
+import LoadingSpinner from "../views/components/ui/LoadingSpinner";
 import RequireAuth from "./guards/RequireAuth";
 
 const loadComponent = (componentName: string) => {
   return lazy(async () => {
-    const module = await import(`../components/layout`) as Record<string, React.ComponentType>;
+    const module = await import(`../views/components/layout`) as Record<string, React.ComponentType>;
     if (!module[componentName]) {
       throw new Error(`Component "${componentName}" not found in features.`);
     }
@@ -22,7 +22,9 @@ const LAYOUT_COMPONENTS = {
 export default function AppRouter() {
   const element = useRoutes(
     ROUTES.map(route => {
-      const Layout = route.layout ? LAYOUT_COMPONENTS[route.layout] : Fragment;
+      const Layout = route.layout && route.layout in LAYOUT_COMPONENTS
+        ? LAYOUT_COMPONENTS[route.layout as keyof typeof LAYOUT_COMPONENTS]
+        : Fragment;
 
       return {
         path: route.path,

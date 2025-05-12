@@ -1,0 +1,19 @@
+# Django
+*.pyc
+*.pyo
+*.mo
+*.db
+*.sqlite3
+*.pid
+*.log
+*.pot
+__pycache__/
+local_settings.py
+.env
+.env/
+.venv/
+venv/
+env/
+media/
+staticfiles/
+.DS_Store

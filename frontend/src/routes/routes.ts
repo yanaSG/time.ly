@@ -3,7 +3,7 @@ import { RouteObject } from "react-router-dom";
 
 const loadComponent = (componentName: string) => {
   return lazy(async () => {
-    const module = await import(`../features`) as Record<string, React.ComponentType>;
+    const module = await import(`../views/features`) as Record<string, React.ComponentType>;
     if (!module[componentName]) {
       throw new Error(`Component "${componentName}" not found in features.`);
     }
