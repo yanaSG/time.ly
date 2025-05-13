@@ -20,12 +20,12 @@ export type AppRoute = RouteObject & {
 };
 
 export const ROUTES: AppRoute[] = [
-  {
-    path: "/",
-    element: React.createElement(loadComponent("Landing")),
-    layout: "MainLayout",
-    meta: { title: "Home" }
-  },
+  // {
+  //   path: "/",
+  //   element: React.createElement(loadComponent("Landing")),
+  //   layout: "MainLayout",
+  //   meta: { title: "Home" }
+  // },
   {
     path: "/login",
     element: React.createElement(loadComponent("Login")),
@@ -42,9 +42,75 @@ export const ROUTES: AppRoute[] = [
     path: "/dashboard",
     element: React.createElement(loadComponent("Dashboard")),
     layout: "MainLayout",
-    meta: { 
-      requiresAuth: true,
-      title: "Dashboard" 
+    meta: {
+      // requiresAuth: true,
+      title: "Dashboard"
     }
-  }
+  },
+  {
+    path: "/notebooks",
+    element: React.createElement(loadComponent("Notebooks")),
+    layout: "MainLayout",
+    meta: {
+      // requiresAuth: true,
+      title: "Notebooks"
+    }
+  },
+  {
+    path: "/profile",
+    element: React.createElement(loadComponent("Profile")),
+    layout: "MainLayout",
+    meta: {
+      // requiresAuth: true,
+      title: "Profile"
+    }
+  },
+  {
+    path: "/settings",
+    element: React.createElement(loadComponent("Settings")),
+    layout: "MainLayout",
+    meta: {
+      // requiresAuth: true,
+      title: "Settings"
+    }
+  },
+];
+
+export const NAV_ROUTES: AppRoute[] = [
+  {
+    path: "/dashboard",
+    element: React.createElement(loadComponent("Dashboard")),
+    layout: "MainLayout",
+    meta: {
+      // requiresAuth: true,
+      title: "Dashboard"
+    }
+  },
+  {
+    path: "/notebooks",
+    element: React.createElement(loadComponent("Notebooks")),
+    layout: "MainLayout",
+    meta: {
+      // requiresAuth: true,
+      title: "Notebooks"
+    }
+  },
+  {
+    path: "/profile",
+    element: React.createElement(loadComponent("Profile")),
+    layout: "MainLayout",
+    meta: {
+      // requiresAuth: true,
+      title: "Profile"
+    }
+  },
+  {
+    path: "/settings",
+    element: React.createElement(loadComponent("Settings")),
+    layout: "MainLayout",
+    meta: {
+      // requiresAuth: true,
+      title: "Settings"
+    }
+  },
 ];

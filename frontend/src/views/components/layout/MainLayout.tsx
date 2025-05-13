@@ -1,23 +1,25 @@
 // src/components/layout/MainLayout.tsx
 import { Outlet } from 'react-router-dom';
-import Header from '../ui/Header';
-import Footer from '../ui/Footer';
-import { ReactNode } from 'react';
+import SideNav from '../ui/SideNav';
+// import Footer from '../ui/Footer';
+import { ReactNode, useState } from 'react';
 
 type MainLayoutProps = {
   children?: ReactNode;
 };
 
 const MainLayout: React.FC = ({ children }: MainLayoutProps) => {
+  
+
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header />
+    <div className="max-h-screen max-w-screen flex bg-gray-50">
+      <SideNav />
       
-      <main className="flex-1 container mx-auto py-8 px-4">
+      <main className="w-full flex-1 mx-auto py-8 px-4">
         {children || <Outlet />}
       </main>
       
-      <Footer className="mt-auto" />
+      {/* <Footer className="mt-auto" /> */}
     </div>
   );    
 }
