@@ -15,7 +15,8 @@ const MainLayout: React.FC = ({ children }: MainLayoutProps) => {
     <div className="max-h-screen max-w-screen flex bg-gray-50">
       <SideNav />
       
-      <main className="w-full flex-1 mx-auto py-8 px-4">
+      <main className="w-full flex-1 mx-auto py-8 px-4 bg-[#EDEDED]">
+        
         {children || <Outlet />}
       </main>
       
