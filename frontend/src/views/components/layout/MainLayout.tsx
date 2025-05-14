@@ -19,7 +19,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       <SideNav />
 
       <main
-        className="w-full flex-1 mx-auto py-8 px-4 shadow-[inset_15px_0_15px_-8px_rgba(0,0,0,0.5)] shadow-emerald-950/30 relative bg-[url('/deco-corner.svg')] bg-no-repeat bg-left-top sm:bg-[length:40%] bg-[length:100%] before:content-[''] before:absolute before:inset-0 before:bg-white before:opacity-30 before:pointer-events-none"
+        className="w-full flex-1 shadow-[inset_15px_0_15px_-8px_rgba(0,0,0,0.5)] shadow-emerald-950/30 relative bg-[url('/deco-corner.svg')] bg-no-repeat bg-left-top sm:bg-[length:40%] bg-[length:100%] before:content-[''] before:absolute before:inset-0 before:bg-white before:opacity-30 before:pointer-events-none"
       >
         {children || <Outlet />}
       </main>
