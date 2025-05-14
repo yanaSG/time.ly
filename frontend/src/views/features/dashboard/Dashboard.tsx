@@ -13,10 +13,10 @@ const Dashboard: React.FC = () => {
       </div>
         
 
-      <div className='fixed flex flex-row gap-5 p-5 z-10 justify-center pl-60 '>
+      <div className='fixed flex flex-row gap-5 p-5 z-10 justify-center pl-20 '>
 
         {/* start of id */}
-        <div className="bg-white h-75 w-120 rounded-3xl border border-grey flex flex-col shadow-lg align-center justify-center items-center transform transition-transform duration-300 hover:scale-105">
+        <div className="bg-white h-75 w-120 rounded-3xl border border-gray-300 flex flex-col shadow-lg align-center justify-center items-center transform transition-transform duration-300 hover:scale-105">
 
           <div className=" border border-black bg-[#FFD25E]  pt-2 pb-2 pl-10 pr-10 rounded-full">
   
@@ -44,7 +44,7 @@ const Dashboard: React.FC = () => {
         </div>
          {/* end of id */}
 
-        <div className="border border-black bg-white h-75 w-50 rounded-3xl shadow-lg transform transition-transform duration-300 hover:scale-105 p-5 flex flex-col items-center">
+        <div className="border border-gray-300 bg-white h-75 w-50 rounded-3xl shadow-lg transform transition-transform duration-300 hover:scale-105 p-5 flex flex-col items-center">
           <p className="font-bold text-lg mb-3">Schedule</p>
             <ul className="text-sm ">
             <li className="bg-white rounded-full ">8:00 AM - GE PE</li>
@@ -55,14 +55,14 @@ const Dashboard: React.FC = () => {
             </ul>
         </div>
 
-         <div className="bg-white h-75 w-50 rounded-3xl shadow-lg transform transition-transform duration-300 hover:scale-105">
-          <p>streak</p>
+        <div className=" border border-gray-300 bg-white h-75 w-50 rounded-3xl shadow-lg transform transition-transform duration-300 hover:scale-105 p-5 flex flex-col items-center">
+          <p className="font-bold text-lg mb-3">Streak</p>
         </div>
 
 
       </div>
 
-      <div className="bg-white h-75 mt-90 rounded-lg">
+      <div className="bg-white h-75 mt-90 rounded-lg shadow-lg">
         <p className="p-10">bulletin board</p>
       </div>
       

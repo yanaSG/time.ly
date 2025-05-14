@@ -3,8 +3,8 @@ import React from 'react'
 const Notebooks = () => {
   return (
     <div>
-      <div className="flex z-0">
-        <div className="flex bg-[#FFD25E] p-3 w-1/6 items-center items-start rounded-2xl shadow-lg text-white">
+      <div className="flex flex-row z-0 align-center items-center gap-5 pt-10">
+        <div className="flex bg-[#FFD25E] mr-100 p-4 w-1/6 items-center align-center justify-center items-start rounded-2xl shadow-lg text-white transition-transform duration-300 hover:scale-105">
           <img 
             src="../../../../../public/add-notebook.png" 
             alt="Add Notebook" 
@@ -13,12 +13,15 @@ const Notebooks = () => {
           <p>Add New Notebook</p>
         </div>
 
-        <div className="mt-5">
+        <div className="">
           <input 
             type="text" 
             placeholder="Search Notebooks..." 
-            className="w-full p-3 rounded-lg border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FFD25E]"
+            className="w-100 p-3 rounded-full border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FFD25E]"
           />
+            <button className="bg-[#FFD25E] text-white rounded-full px-4 py-2 ml-2 hover:bg-[#E6B84F] transition-transform duration-300 hover:scale-105">
+            Search
+            </button>
         </div>
 
       </div>
