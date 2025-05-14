@@ -74,6 +74,15 @@ export const ROUTES: AppRoute[] = [
       title: "Settings"
     }
   },
+  {
+    path: "/note",
+    element: React.createElement(loadComponent("Note")),
+    layout: "MainLayout",
+    meta: {
+      // requiresAuth: true,
+      title: "Note"
+    }
+  },
 ];
 
 export const NAV_ROUTES: AppRoute[] = [
