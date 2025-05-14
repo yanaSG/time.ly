@@ -7,6 +7,7 @@ interface Notebook{
 }
 
 const Notebooks: React.FC = () => {
+  
   // State to track created notebooks; each notebook is an object with id, name, and description
   const [notebooks, setNotebooks] = useState<Notebook[]>([]);
   const [showModal, setShowModal] = useState(false);
@@ -14,7 +15,8 @@ const Notebooks: React.FC = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
 
-  
+  // Effect to handle body overflow when modal is open
+  // This prevents scrolling of the background content when the modal is open
   useEffect(() => {
     if(showModal){
       document.body.style.overflow='hidden';
@@ -23,14 +25,17 @@ const Notebooks: React.FC = () => {
     }
   }, [showModal]);
 
+  // Function to open and close the modal
   const openModal = () => setShowModal(true);
+  // Function to close the modal and reset the form fields
   const closeModal = () => {
     setTitle('');
     setDescription('');
     setShowModal(false);
   };
 
-
+  // Function to handle form submission
+  // It creates a new notebook object and adds it to the notebooks state
   const handleFormSubmit = (e: React.FormEvent) => {
 
     if(title.trim()===''){
@@ -57,15 +62,6 @@ const Notebooks: React.FC = () => {
     }
   };
 
-  // // Handler to add a new notebook
-  // const handleAddNotebook = () => {
-  //   const newNotebook = {
-  //     id: notebooks.length,
-  //     name: `Notebook ${notebooks.length + 1}`,
-  //     description: `Description of notebook ${notebooks.length + 1}`,
-  //   };
-  //   setNotebooks(prev => [...prev, newNotebook]);
-  // };
 
   return (
     <div>
@@ -116,7 +112,7 @@ const Notebooks: React.FC = () => {
                 className="absolute pl-2 h-42 w-auto z-0"
               />
             </div>
-            <div className="flex flex-col justify-center bg-[#FFD25E] h-55 w-40 rounded-2xl z-10 shadow-lg pl-2">
+            <div className="pl-4 pr- 5 flex flex-col justify-center bg-[#FFD25E] h-55 w-40 rounded-2xl z-10 shadow-lg pl-2">
               <h3 className="text-xl font-bold text-white">{notebook.name}</h3>
               <p className="text-white text-sm">{notebook.description}</p>
             </div>
@@ -127,10 +123,12 @@ const Notebooks: React.FC = () => {
       {/* Modal for creating a new notebook */}
       {showModal && ( 
         <div
+        // Overlay to close modal on click
           onClick={handleOverlayClick}
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
           aria-modal="true"
           role="dialog"
+          // Accessibility attributes for screen readers
           aria-labelledby="modal-title"
           aria-describedby="modal-description"
         >
@@ -174,6 +172,7 @@ const Notebooks: React.FC = () => {
             <div className="flex gap-4 justify-end">
               <button
                 type="button"
+                // Close modal on click
                 onClick={closeModal}
                 className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
               >
