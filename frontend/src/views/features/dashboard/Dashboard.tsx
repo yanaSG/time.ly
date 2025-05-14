@@ -56,10 +56,10 @@ const Dashboard: React.FC = () => {
           <p className="font-bold text-lg mb-3">Schedule</p>
             <ul className="text-sm ">
             <li className="bg-white rounded-full ">8:00 AM - GE PE</li>
-            <li className="border border-gray-300">10:00 AM - GE UTS</li>
-            <li className="border border-gray-300">12:00 PM - Lunch Break</li>
-            <li className="border border-gray-300">2:00 PM - History Lecture</li>
-            <li className="border border-gray-300">4:00 PM - Gym Session</li>
+            <li>10:00 AM - GE UTS</li>
+            <li>12:00 PM - Lunch Break</li>
+            <li>2:00 PM - History Lecture</li>
+            <li>4:00 PM - Gym Session</li>
             </ul>
         </div>
 
