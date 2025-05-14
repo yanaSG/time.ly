@@ -29,10 +29,18 @@ const Dashboard: React.FC = () => {
               className=" h-45 w-45 rounded-lg shadow-lg"
             />
           
-            <div className="flex flex-col justify-center items-center align-center mr-30">
-             <p>Name: Jennie</p>
-             <p>Course: Nursing</p>
-             <p>Likes: k-pop</p>
+            <div className="flex flex-row align-center pl-10 mr-15">
+              <div className="font-bold">
+                <p>Name:</p>
+                <p>Course: </p>
+                <p>Likes: </p>
+              </div>
+              <div className="pl-2">
+                <p>Jennie</p>
+                <p>Nursing</p>
+                <p>k-pop</p>
+              </div>
+            
             </div>
 
           </div>
