@@ -1,8 +1,18 @@
 import React from 'react'
+import NoteSideBar from '../../components/features/NoteSideBar'
+import NoteAssistBar from '../../components/features/NoteAssistBar'
 
 const Note = () => {
   return (
-    <div>Note</div>
+    <div className='w-full h-full p-5 bg-zinc-600/15'>
+      <div className='w-full h-full flex bg-white/60 rounded-lg shadow-lg justify-between gap-5'>
+        <NoteSideBar noteTitle='Lesson 1: Derivatives' notebook='Calculus 1' />
+        <div>
+          
+        </div>
+        <NoteAssistBar />
+      </div>
+    </div>
   )
 }
 
