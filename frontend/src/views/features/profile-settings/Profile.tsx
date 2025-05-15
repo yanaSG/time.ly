@@ -17,17 +17,16 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Bio */}
+    
         <div className="w-full bg-yellow-50 rounded-xl p-4 mb-6 text-gray-700">
           <span className="font-semibold">Bio:</span> Passionate learner and note-taker.
         </div>
 
-        {/* Edit Profile Button */}
+  
         <button className="w-full md:w-auto bg-yellow-200 hover:bg-yellow-300 text-gray-800 font-semibold py-2 px-6 rounded-lg shadow transition mb-8">
           Edit Profile
         </button>
 
-        {/* Account Security Section */}
         <div className="w-full">
           <h3 className="text-lg font-semibold text-cyan-700 mb-4">Account Security</h3>
           <div className="mb-6">
