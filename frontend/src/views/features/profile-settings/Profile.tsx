@@ -11,18 +11,79 @@ const Profile = () => {
         return (
           <>
           <Dialog.Title className="text-xl font-bold mb-4">Edit Profile</Dialog.Title>
-          <p className="mb-4">Profile editing form goes here.</p>
-          <button className="bg-cyan-700 text-white px-4 py-2 rounded" onClick={()=> setModal(null)}>Back to Profile</button>
+
+          <form className="flex flex-col gap-4">
+            <div className="flex flex-col items-center gap-2">
+      <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center border-2 border-yellow-200">
+        <FaRegUser className="text-gray-400" size={40} />
+      </div>
+      <input type="file" accept="image/*" className="text-sm" placeholder='Upload profile photo' />
+      <span className="text-xs text-gray-500">Add or change your profile photo</span>
+    </div>
+    {/* Username */}
+    <input
+      type="text"
+      placeholder="Username"
+      className="border rounded px-3 py-2"
+    />
+    {/* First Name */}
+    <input
+      type="text"
+      placeholder="First Name"
+      className="border rounded px-3 py-2"
+    />
+    {/* Last Name */}
+    <input
+      type="text"
+      placeholder="Last Name"
+      className="border rounded px-3 py-2"
+    />
+    <div className="flex gap-2 mt-4">
+      <button type="submit" className="bg-cyan-700 text-white px-4 py-2 rounded">Save</button>
+      <button type="button" className="bg-gray-200 px-4 py-2 rounded" onClick={() => setModal(null)}>Cancel</button>
+    </div>
+  </form>
           
-          </>
-        )
+  <a
+   href="#"
+     className="text-cyan-700 underline mt-4 inline-block"
+     onClick={e => {
+      e.preventDefault();
+        setModal(null);
+        }}
+  >
+    Back to Profile
+  </a>
+          
+</>
+   )
 
         case 'email':
           return (
             <>
             <Dialog.Title className="text-xl font-bold mb-4">Change Email</Dialog.Title>
-            <p className="mb-4">Change email form goes here.</p>
-            <button className="bg-cyan-700 text-white px-4 py-2 rounded" onClick={() => setModal(null)}>Back to Profile</button>
+            <form className="flex flex-col gap-4">
+              <input
+                type="email"
+                placeholder="New Email"
+                className="border rounded px-3 py-2"
+              />
+              <div className="flex gap-2 mt-4">
+                <button type="submit" className="bg-cyan-700 text-white px-4 py-2 rounded">Save</button>
+                <button type="button" className="bg-gray-200 px-4 py-2 rounded" onClick={() => setModal(null)}>Cancel</button>
+              </div>
+            </form>
+
+              <a
+                href="#"
+                className="text-cyan-700 underline mt-4 inline-block"
+                onClick={e => {
+                  e.preventDefault();
+                  setModal(null);
+                }}
+              >
+                Back to Profile
+              </a>
             </>
           )
 
@@ -30,16 +91,50 @@ const Profile = () => {
         return (
           <>
             <Dialog.Title className="text-xl font-bold mb-4">Add Password</Dialog.Title>
-            <p className="mb-4">Add password form goes here.</p>
-            <button className="bg-cyan-700 text-white px-4 py-2 rounded" onClick={() => setModal(null)}>Back to Profile</button>
+
+              <form className="flex flex-col gap-4">
+                <input
+                  type="password"
+                  placeholder="New Password"
+                  className="border rounded px-3 py-2"
+                />
+                <input
+                  type="password"
+                  placeholder="Confirm Password"
+                  className="border rounded px-3 py-2"
+                />
+                <div className="flex gap-2 mt-4">
+                  <button type="submit" className="bg-cyan-700 text-white px-4 py-2 rounded">Save</button>
+                  <button type="button" className="bg-gray-200 px-4 py-2 rounded" onClick={() => setModal(null)}>Cancel</button>
+                </div>
+              </form>
+              <a
+                href="#"
+                className="text-cyan-700 underline mt-4 inline-block"
+                onClick={e => {
+                  e.preventDefault();
+                  setModal(null);
+                }}
+              >
+                Back to Profile
+              </a>
           </>
         )
       case 'passkey':
         return (
           <>
             <Dialog.Title className="text-xl font-bold mb-4">Add Passkey</Dialog.Title>
-            <p className="mb-4">Add passkey setup goes here.</p>
-            <button className="bg-cyan-700 text-white px-4 py-2 rounded" onClick={() => setModal(null)}>Back to Profile</button>
+            
+            <a
+              href="#"
+              className="text-cyan-700 underline mt-4 inline-block"
+              onClick={e => {
+                e.preventDefault();
+                setModal(null);
+              }}
+            >
+              Back to Profile
+            </a>
           </>
         )
       default:
