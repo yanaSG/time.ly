@@ -131,14 +131,9 @@ const MarkdownEditor = () => {
     <div
       ref={containerRef}
       style={{
-        background: '#FFFFFF',
-        color: '#333333',
-        minHeight: '500px',
-        display: 'flex',
-        flexDirection: 'column',
-        padding: '16px',
         fontFamily: 'system-ui, sans-serif',
       }}
+      className='bg-white text-[#333333] h-full w-full flex flex-col p-4'
     >
       {lines.map((line, index) => (
         <div 

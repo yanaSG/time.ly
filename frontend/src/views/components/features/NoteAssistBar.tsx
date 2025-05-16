@@ -56,7 +56,7 @@ const NoteAssistBar: React.FC = () => {
   }
 
   return (
-    <div className={`w-15 h-full flex flex-col justify-start gap-1 bg-white/40 rounded-xl shadow-lg ${isOpen ? 'w-60' : ''} transform transition-all duration-200`}>
+    <div className={`w-15 h-full flex flex-col justify-start gap-1 bg-white/40 rounded-xl shadow-lg ${isOpen ? 'w-75' : ''} transform transition-all duration-200`}>
       {
         isOpen && (
           <div onClick={() => openAssistBar(null)}
