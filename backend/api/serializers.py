@@ -47,3 +47,4 @@ class ObtainTokenSerializer(TokenObtainPairSerializer):
         token = super().get_token(user)
         token['username'] = user.username
         return token
+

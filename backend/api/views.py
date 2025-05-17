@@ -8,6 +8,16 @@ from django.contrib.auth import authenticate
 from .serializers import *
 from .models import * 
 
+
+import openai
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json   
+from django.conf import settings
+
+
+openai.api_key = settings.OPENAI_API_KEY
+
 class RegisterView(generics.CreateAPIView):
     queryset = CustomUser .objects.all()
     permission_classes = (AllowAny,)
@@ -52,3 +62,20 @@ class LoginView(generics.GenericAPIView):
             }, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+
+@csrf_exempt
+def chat_with_gpt(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            messages = data.get("messages", [])
+
+            response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=messages
+            )
+            return JsonResponse(response)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+    return JsonResponse({"error": "Invalid request"}, status=400)
