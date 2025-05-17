@@ -65,41 +65,38 @@ const Notebooks: React.FC = () => {
 
   return (
     <div>
-      <div onClick={openModal}
-        role="button"
-        tabIndex={0}
-
-        //what is this
-        onKeyDown={e => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            openModal();
-          }
-        }}
-
-        className="flex flex-row z-0 align-center items-center gap-5 pt-10"
+      <div className="flex flex-row ">
+        <div onClick={openModal}
+          role="button"
+          tabIndex={0}
+          onKeyDown={e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              openModal();
+            }
+          }}
+          className="flex flex-row z-0 align-center items-center gap-5 p-10 w-full"
         >
-        <div className="flex bg-[#FFD25E] mr-100 p-4 w-1/6 items-center align-center justify-center items-start rounded-2xl shadow-lg text-white transition-transform duration-300 hover:scale-105">
-          <img 
-            src="../../../../../public/add-notebook.png" 
-            alt="Add Notebook" 
-            className="h-5 w-5 inline-block mr-2"
-          />
-          <p>Add New Notebook</p>
+          <div className="flex bg-[#FFD25E] mr-100 p-4 w-1/4.5 items-center align-center justify-center items-start rounded-2xl shadow-lg text-white transition-transform duration-300 hover:scale-105">
+            <img 
+              src="../../../../../public/add-notebook.png" 
+              alt="Add Notebook" 
+              className="h-5 w-5 inline-block mr-2"
+            />
+            <p>Add New Notebook</p>
+          </div>
         </div>
 
-        <div className="">
+        <div className="p-4 w-1/2 flex justify-end items-center">
           <input 
             type="text" 
             placeholder="Search Notebooks..." 
-            className="w-100 p-3 rounded-full border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FFD25E]"
+            className="w-100 p-3 h-1/2 rounded-full border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FFD25E]"
           />
-            <button className="bg-[#FFD25E] text-white rounded-full px-4 py-2 ml-2 hover:bg-[#E6B84F] transition-transform duration-300 hover:scale-105">
+          <button className="bg-[#FFD25E] h-1/2 text-white rounded-full px-4 py-2 ml-2 hover:bg-[#E6B84F] transition-transform duration-300 hover:scale-105">
             Search
-            </button>
+          </button>
         </div>
-
       </div>
-      
         {/* notebooks */}
       <div className="flex flex-row gap-5 pt-10">
 
