@@ -101,19 +101,24 @@ const Notebooks: React.FC = () => {
       <div className="flex flex-row gap-5 pt-10">
 
         {notebooks.map(notebook => (
-          <div key={notebook.id} className="flex flex-row gap-5 transform transition-transform duration-300 hover:scale-105">
+            <div
+            key={notebook.id}
+            // onClick={() => window.location.href = `/note/${notebook.id}`}
+            onClick={() => window.location.href = `/note`}
+            className="flex flex-row gap-5 transform transition-transform duration-300 hover:scale-105 cursor-pointer"
+            >
             <div className="pt-6">
               <img 
-                src="/binder.png" 
-                alt="Dashboard Illustration" 
-                className="absolute pl-2 h-42 w-auto z-0"
+              src="/binder.png" 
+              alt="Dashboard Illustration" 
+              className="absolute pl-2 h-42 w-auto z-0"
               />
             </div>
             <div className="pl-4 pr- 5 flex flex-col justify-center bg-[#FFD25E] h-55 w-40 rounded-2xl z-10 shadow-lg pl-2">
               <h3 className="text-xl font-bold text-white">{notebook.name}</h3>
               <p className="text-white text-sm">{notebook.description}</p>
             </div>
-          </div>
+            </div>
         ))}
       </div>
 

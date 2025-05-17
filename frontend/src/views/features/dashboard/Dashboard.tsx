@@ -67,13 +67,11 @@ const Dashboard: React.FC = () => {
           <p className="font-bold text-lg mb-3">Streak</p>
         </div>
 
-
       </div>
 
-      <div className="bg-white h-75 mt-90 rounded-lg shadow-lg">
+      <div className="bg-white w-11/12 h-75 mt-90 rounded-xl shadow-2xl mx-auto">
         <p className="p-10">bulletin board</p>
       </div>
-      
     </div>
   )
 }
