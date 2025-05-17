@@ -8,15 +8,52 @@ from django.contrib.auth import authenticate
 from .serializers import *
 from .models import * 
 
-
-import openai
+import os
+import json
+import requests
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-import json   
-from django.conf import settings
+from dotenv import load_dotenv
 
+load_dotenv()  # Loads CHUTES_API_TOKEN from .env file
 
-openai.api_key = settings.OPENAI_API_KEY
+@csrf_exempt
+def chat_with_deepseek(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            messages = data.get("messages", [])
+
+            api_token = os.getenv("CHUTES_API_TOKEN")
+            if not api_token:
+                return JsonResponse({"error": "API token not found in environment."}, status=500)
+
+            headers = {
+                "Authorization": f"Bearer {api_token}",
+                "Content-Type": "application/json",
+            }
+
+            payload = {
+                "model": "deepseek-ai/DeepSeek-R1",
+                "messages": messages,
+                "stream": False,  # Change to True if handling streaming in future
+                "max_tokens": 1024,
+                "temperature": 0.7
+            }
+
+            response = requests.post(
+                "https://llm.chutes.ai/v1/chat/completions",
+                headers=headers,
+                json=payload
+            )
+
+            response.raise_for_status()
+            return JsonResponse(response.json())
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=400)
 
 class RegisterView(generics.CreateAPIView):
     queryset = CustomUser .objects.all()
@@ -64,18 +101,3 @@ class LoginView(generics.GenericAPIView):
             return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
         
 
-@csrf_exempt
-def chat_with_gpt(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            messages = data.get("messages", [])
-
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=messages
-            )
-            return JsonResponse(response)
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
-    return JsonResponse({"error": "Invalid request"}, status=400)
