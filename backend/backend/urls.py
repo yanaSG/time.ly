@@ -27,8 +27,8 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path("api/chat/", chat_with_gpt),
     
-    path('documents/', DocumentListCreateView.as_view(), name='document-list'),
-    path('documents/<int:pk>/', DocumentDetailView.as_view(), name='document-detail'),
-    path('documents/<int:pk>/download/', DocumentDownloadView.as_view(), name='document-download'),
-    path('documents/<int:pk>/view/', DocumentViewInBrowser.as_view(), name='document-view'),
+    path('documents/', BookListCreateView.as_view(), name='document-list'),
+    path('documents/<int:pk>/', BookDetailView.as_view(), name='document-detail'),
+    path('documents/<int:pk>/download/', BookDownloadView.as_view(), name='document-download'),
+    path('documents/<int:pk>/view/', BookViewInBrowser.as_view(), name='document-view'),
 ]

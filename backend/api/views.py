@@ -1,3 +1,4 @@
+import io
 from rest_framework import generics, viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -17,6 +18,8 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 import logging
 import urllib
+from .tasks import process_academic_pdf
+import PyPDF2
 
 logger = logging.getLogger(__name__)
 
@@ -85,18 +88,40 @@ def chat_with_gpt(request):
             return JsonResponse({"error": str(e)}, status=500)
     return JsonResponse({"error": "Invalid request"}, status=400)
 
-class DocumentListCreateView(generics.ListCreateAPIView):
-    queryset = Document.objects.all().order_by('-uploaded_at')
+class BookListCreateView(generics.ListCreateAPIView):
+    queryset = Book.objects.all().order_by('-uploaded_at')
     
     def get_serializer_class(self):
-        return DocumentUploadSerializer if self.request.method == 'POST' else DocumentResponseSerializer
+        return BookUploadSerializer if self.request.method == 'POST' else BookResponseSerializer
     
-class DocumentDetailView(generics.RetrieveUpdateDestroyAPIView):
+    def create(self, request):
+        # Validate PDF
+        try:
+            PyPDF2.PdfReader(io.BytesIO(request.FILES['pdf'].read()))
+        except:
+            return Response({"error": "Invalid PDF"}, status=400)
+
+        # Save book
+        book = Book.objects.create(
+            title=request.data.get('title'),
+            pdf_data=request.FILES['pdf'].read(),
+            domain=request.data.get('domain')
+        )
+        
+        # Start processing
+        process_academic_pdf.delay(book.id)
+        
+        return Response({
+            "status": "processing_started",
+            "book_id": book.id
+        }, status=202)
+    
+class BookDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     Handle GET (detail), PUT/PATCH (update), and DELETE operations
     """
-    queryset = Document.objects.all()
-    serializer_class = DocumentResponseSerializer
+    queryset = Book.objects.all()
+    serializer_class = BookResponseSerializer
 
     def get_object(self):
         """Override to provide custom lookup"""
@@ -124,8 +149,8 @@ class DocumentDetailView(generics.RetrieveUpdateDestroyAPIView):
             status=status.HTTP_204_NO_CONTENT
         )
     
-class DocumentDownloadView(generics.RetrieveAPIView):
-    queryset = Document.objects.all()
+class BookDownloadView(generics.RetrieveAPIView):
+    queryset = Book.objects.all()
     
     def get(self, request, *args, **kwargs):
         document = self.get_object()
@@ -143,8 +168,8 @@ class DocumentDownloadView(generics.RetrieveAPIView):
         response['Content-Disposition'] = f'attachment; filename="{filename}"; filename*=UTF-8\'\'{encoded_filename}'
         return response
 
-class DocumentViewInBrowser(generics.RetrieveAPIView):
-    queryset = Document.objects.all()
+class BookViewInBrowser(generics.RetrieveAPIView):
+    queryset = Book.objects.all()
     
     def get(self, request, *args, **kwargs):
         document = self.get_object()

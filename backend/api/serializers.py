@@ -49,28 +49,28 @@ class ObtainTokenSerializer(TokenObtainPairSerializer):
         token['username'] = user.username
         return token
 
-class DocumentUploadSerializer(serializers.ModelSerializer):
+class BookUploadSerializer(serializers.ModelSerializer):
     pdf_file = serializers.FileField(write_only=True, required=True)
 
     class Meta:
-        model = Document
-        fields = ['title', 'pdf_file']
+        model = Book
+        fields = ['title', 'pdf_file', 'domain']
     
     def create(self, validated_data):
         pdf_file = validated_data.pop('pdf_file')
-        return Document.objects.create(
+        return Book.objects.create(
             title=validated_data.get('title', pdf_file.name),
             original_filename=pdf_file.name,  # Store original name
             pdf_data=pdf_file.read()
         )
 
-class DocumentResponseSerializer(serializers.ModelSerializer):
+class BookResponseSerializer(serializers.ModelSerializer):
     download_url = serializers.SerializerMethodField()
     view_url = serializers.SerializerMethodField()
     original_filename = serializers.CharField(read_only=True)  # Include in response
 
     class Meta:
-        model = Document
+        model = Book
         fields = ['id', 'title', 'original_filename', 'uploaded_at', 'download_url', 'view_url']
 
     def get_download_url(self, obj):
