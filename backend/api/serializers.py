@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import *
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+import base64
 
 class RegisterSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)
@@ -48,3 +49,34 @@ class ObtainTokenSerializer(TokenObtainPairSerializer):
         token['username'] = user.username
         return token
 
+class DocumentUploadSerializer(serializers.ModelSerializer):
+    pdf_file = serializers.FileField(write_only=True, required=True)
+
+    class Meta:
+        model = Document
+        fields = ['title', 'pdf_file']
+    
+    def create(self, validated_data):
+        pdf_file = validated_data.pop('pdf_file')
+        return Document.objects.create(
+            title=validated_data.get('title', pdf_file.name),
+            original_filename=pdf_file.name,  # Store original name
+            pdf_data=pdf_file.read()
+        )
+
+class DocumentResponseSerializer(serializers.ModelSerializer):
+    download_url = serializers.SerializerMethodField()
+    view_url = serializers.SerializerMethodField()
+    original_filename = serializers.CharField(read_only=True)  # Include in response
+
+    class Meta:
+        model = Document
+        fields = ['id', 'title', 'original_filename', 'uploaded_at', 'download_url', 'view_url']
+
+    def get_download_url(self, obj):
+        request = self.context.get('request')
+        return request.build_absolute_uri(f'/documents/{obj.id}/download/') if request else None
+
+    def get_view_url(self, obj):
+        request = self.context.get('request')
+        return request.build_absolute_uri(f'/documents/{obj.id}/view/') if request else None

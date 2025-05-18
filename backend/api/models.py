@@ -16,3 +16,12 @@ class CustomUser(AbstractUser):
     ]
     
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='user')
+
+class Document(models.Model):
+    title = models.CharField(max_length=100)
+    original_filename = models.CharField(max_length=255, blank=True)  # New field
+    pdf_data = models.BinaryField()
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.title} ({self.original_filename})"
