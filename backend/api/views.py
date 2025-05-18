@@ -1,4 +1,5 @@
 from rest_framework import generics
+from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -99,5 +100,17 @@ class LoginView(generics.GenericAPIView):
             }, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
+class NotebookListCreateView(generics.ListCreateAPIView):
+    serializer_class = NotebookSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Only return notebooks that belong to the logged-in user
+        return Notebook.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        # Automatically set the user when saving a new notebook
+        serializer.save(user=self.request.user)
         
 
