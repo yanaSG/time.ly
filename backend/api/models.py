@@ -9,7 +9,10 @@ class CustomUser(AbstractUser):
     lname = models.CharField(max_length=30, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+    image = models.ImageField(upload_to='../profile', blank=True, null=True)
+    school = models.CharField(max_length=100, blank=True)
+    likes = models.PositiveIntegerField(default=0)
+
     ROLE_CHOICES = [
         ('admin', 'Admin'),
         ('user', 'User'),

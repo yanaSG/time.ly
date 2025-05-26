@@ -33,6 +33,15 @@ export const ROUTES: AppRoute[] = [
     meta: { title: "Login" }
   },
   {
+    path: "/setup",
+    element: React.createElement(loadComponent("Setup")),
+    //layout: "MainLayout",
+    meta: {
+      // requiresAuth: true,
+      title: "Setup"
+    }
+  },
+  {
     path: "/register",
     element: React.createElement(loadComponent("Register")),
     layout: "AuthLayout",
@@ -96,6 +105,15 @@ export const NAV_ROUTES: AppRoute[] = [
     }
   },
   {
+    path: "/setup",
+    element: React.createElement(loadComponent("Setup")),
+    layout: "MainLayout",
+    meta: {
+      // requiresAuth: true,
+      title: "Setup"
+    }
+  },
+  {
     path: "/notebooks",
     element: React.createElement(loadComponent("Notebooks")),
     layout: "MainLayout",
@@ -122,4 +140,5 @@ export const NAV_ROUTES: AppRoute[] = [
       title: "Settings"
     }
   },
+   
 ];
