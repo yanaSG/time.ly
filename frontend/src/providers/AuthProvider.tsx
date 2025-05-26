@@ -30,7 +30,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
-  const register = async (data: { username: string; fname: string; lname: string; email: string; password: string, password2: string }) => {
+  const register = async (data: { username: string; fname: string; lname: string; email: string; password: string, password2: string, image: File, school: string, course: string, likes: string, }) => {
     try {
       const response = await authService.register(data);
       setUser(response.username);

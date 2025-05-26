@@ -14,6 +14,10 @@ interface RegisterData {
   lname: string;
   email: string;
   password: string;
+  image: File;
+  school: string;
+  course: string;
+  likes: string;
 }
 
 const login = async (username: string, password: string): Promise<LoginResponse> => {

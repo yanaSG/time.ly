@@ -1,4 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
+import AuthInput from '../../components/ui/inputs/AuthInput'
+import AuthButton from '../../components/ui/buttons/AuthButton'
 
 const Setup = () => {
   return (
