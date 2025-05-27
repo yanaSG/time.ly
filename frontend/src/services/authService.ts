@@ -14,6 +14,10 @@ interface RegisterData {
   lname: string;
   email: string;
   password: string;
+  
+}
+
+interface ProfileCardData {
   image: File;
   school: string;
   course: string;
@@ -29,13 +33,21 @@ const logout = (): void => {
   localStorage.removeItem('token');
 };
 
-const register = async (userData: RegisterData): Promise<LoginResponse> => {
+const register = async (userData: RegisterData) => {
   const response = await axios.post<LoginResponse>(`${API_URL}register/`, userData);
   return response.data;
 };
+
+const profile_setup = async (profileCardData: ProfileCardData): Promise<LoginResponse> => {
+  const response = await axios.post<LoginResponse>(`${API_URL}register/profile`, profileCardData);
+  return response.data;
+};
+
+
 
 export default {
   login,
   logout,
   register,
+  profile_setup
 };

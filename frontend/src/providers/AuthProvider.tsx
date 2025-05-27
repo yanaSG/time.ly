@@ -7,7 +7,8 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (data: { username: string; password: string }) => Promise<void>;
   logout: () => void;
-  register: (data: { username: string; fname: string; lname: string; email: string; password: string; password2: string; }) => Promise<void>;
+  register: (data: { username: string; fname: string; lname: string; email: string; password: string; password2: string; image: File; school: string; course: string; likes: string; }) => Promise<void>;
+  updateProfile: (data: { image: File; school: string; course: string; likes: string; }) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -42,6 +43,16 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
+  const updateProfile = async (data: { image: File; school: string; course: string; likes: string; }) => {
+    try {           
+      await authService.profile_setup(data);
+      navigate('/dashboard');
+    }catch (error) {
+      console.error('Setup Failed:', error);
+    }
+  };
+
+  
   const logout = () => {
     authService.logout();
     setUser('');
@@ -51,7 +62,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: user ? true : false, login, logout, register }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: user ? true : false, login, logout, register, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );

@@ -13,11 +13,26 @@ interface RegisterForm {
   email: string;
   password: string;
   password2: string;
+  image: File;
+  school: string;
+  course: string;
+  likes: string;
 }
 
 const Register: React.FC = () => {
   const { register } = useAuth();
-  const [formData, setFormData] = useState<RegisterForm>({ username: '', fname: '', lname: '', email: '', password: '', password2: '' });
+  const [formData, setFormData] = useState<RegisterForm>({
+    username: '',
+    fname: '',
+    lname: '',
+    email: '',
+    password: '',
+    password2: '',
+    image: new File([], ""), // Provide a default empty File object
+    school: '',
+    course: '',
+    likes: ''
+  });
   const [error, setError] = useState<string>('');
 
   const validateEmail = (email: string) => {

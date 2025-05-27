@@ -16,8 +16,16 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+AUTH_USER_MODEL = 'api.CustomUser'
 
 
 # Quick-start development settings - unsuitable for production
@@ -25,10 +33,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-5%($1+4qc=3b9&vpgwn@xyb#vz62r#85iau_709uj%pfz_trl^'
-
-
-
-
 
 
 # SECURITY WARNING: don't run with debug turned on in production!

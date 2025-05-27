@@ -38,6 +38,17 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Email already used.")
         return value
     
+class UserProfileUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['image', 'school', 'course', 'likes']
+        extra_kwargs = {
+            'image': {'required': False},
+            'school': {'required': False},
+            'course': {'required': False},
+            'likes': {'required': False},
+        }
+        
 class ObtainTokenSerializer(TokenObtainPairSerializer):
     username = serializers.CharField(required=True)
     password = serializers.CharField(write_only=True, required=True)
