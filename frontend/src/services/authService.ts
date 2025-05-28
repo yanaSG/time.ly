@@ -14,15 +14,21 @@ interface RegisterData {
   lname: string;
   email: string;
   password: string;
+  password2: string;
+  // added null fields to match the backend requirements
+  // image: null;
+  // course: null;
+  // school: null;
+  // likes: null
   
 }
 
-interface ProfileCardData {
-  image: File;
-  school: string;
-  course: string;
-  likes: string;
-}
+// interface ProfileCardData {
+//   image: File | null;
+//   school: string;
+//   course: string;
+//   likes: BigInt;
+// }
 
 const login = async (username: string, password: string): Promise<LoginResponse> => {
   const response = await axios.post<LoginResponse>(`${API_URL}login/`, { username, password });
@@ -38,8 +44,17 @@ const register = async (userData: RegisterData) => {
   return response.data;
 };
 
-const profile_setup = async (profileCardData: ProfileCardData): Promise<LoginResponse> => {
-  const response = await axios.post<LoginResponse>(`${API_URL}register/profile`, profileCardData);
+const updateProfile = async (profileCardData: FormData): Promise<LoginResponse> => {
+  const token = localStorage.getItem('token');
+  const response = await axios.put<LoginResponse>(`${API_URL}register/profile/`, 
+    profileCardData,
+    {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data'
+      }
+    }
+  );
   return response.data;
 };
 
@@ -49,5 +64,5 @@ export default {
   login,
   logout,
   register,
-  profile_setup
+  updateProfile
 };

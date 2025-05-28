@@ -7,8 +7,22 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (data: { username: string; password: string }) => Promise<void>;
   logout: () => void;
-  register: (data: { username: string; fname: string; lname: string; email: string; password: string; password2: string; image: File; school: string; course: string; likes: string; }) => Promise<void>;
-  updateProfile: (data: { image: File; school: string; course: string; likes: string; }) => Promise<void>;
+  register: (data: { 
+    username: string; 
+    fname: string; 
+    lname: string; 
+    email: string; 
+    password: string; 
+    password2: string;
+    
+    // added null fields to match the backend requirements
+    // image: null; 
+    // school: null; 
+    // course: null; 
+    // likes: null; 
+  }) => Promise<void>;
+  // Note: The updateProfile function expects a FormData object
+  updateProfile: (data: FormData ) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,21 +45,34 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
-  const register = async (data: { username: string; fname: string; lname: string; email: string; password: string, password2: string, image: File, school: string, course: string, likes: string, }) => {
+  const register = async (data: { 
+    username: string; 
+    fname: string; 
+    lname: string; 
+    email: string; 
+    password: string, 
+    password2: string;
+    // added null fields to match the backend requirements
+    // image: null, 
+    // school: null, 
+    // course: null, 
+    // likes: null,  
+  }) => {
     try {
       const response = await authService.register(data);
       setUser(response.username);
       setToken(response.access);
       localStorage.setItem('token', response.access);
-      navigate('/dashboard');
+      navigate('/setup');
     } catch (error) {
       console.error('Registration failed:', error);
     }
   };
 
-  const updateProfile = async (data: { image: File; school: string; course: string; likes: string; }) => {
+  // Note: The updateProfile function expects a FormData object
+  const updateProfile = async (data: FormData) => {
     try {           
-      await authService.profile_setup(data);
+      await authService.updateProfile(data);
       navigate('/dashboard');
     }catch (error) {
       console.error('Setup Failed:', error);

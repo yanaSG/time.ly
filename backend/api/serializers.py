@@ -9,6 +9,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     lname = serializers.CharField(required=True)
     password = serializers.CharField(write_only=True, required=True)
     password2 = serializers.CharField(write_only=True, required=True)
+    
 
     class Meta:
         model = CustomUser 

@@ -77,7 +77,6 @@ class RegisterView(generics.CreateAPIView):
         }, status=status.HTTP_201_CREATED)
 
 class UserProfileUpdateView(generics.UpdateAPIView):
-
     queryset = CustomUser.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserProfileUpdateSerializer
