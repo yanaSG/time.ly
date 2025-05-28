@@ -12,9 +12,11 @@ const api: AxiosInstance = axios.create({
 api.interceptors.request.use((config) => {
   const internalConfig = config as InternalAxiosRequestConfig;
   const token = getAccessToken();
+  
   if (token && internalConfig.headers) {
     internalConfig.headers.Authorization = `Bearer ${token}`;
   }
+
   return internalConfig;
 });
 

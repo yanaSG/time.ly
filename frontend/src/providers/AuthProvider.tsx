@@ -8,6 +8,7 @@ interface AuthContextType {
   login: (data: { username: string; password: string }) => Promise<void>;
   logout: () => void;
   register: (data: { 
+    
     username: string; 
     fname: string; 
     lname: string; 
@@ -20,9 +21,11 @@ interface AuthContextType {
     // school: null; 
     // course: null; 
     // likes: null; 
+
   }) => Promise<void>;
   // Note: The updateProfile function expects a FormData object
   updateProfile: (data: FormData ) => Promise<void>;
+  getUserDetails: () => Promise<any>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -52,11 +55,14 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     email: string; 
     password: string, 
     password2: string;
+
     // added null fields to match the backend requirements
+
     // image: null, 
     // school: null, 
     // course: null, 
     // likes: null,  
+
   }) => {
     try {
       const response = await authService.register(data);
@@ -79,7 +85,6 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
-  
   const logout = () => {
     authService.logout();
     setUser('');
@@ -88,8 +93,18 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     navigate('/login');
   };
 
+  const getUserDetails = async () => {
+    try {
+      const details = await authService.getUserProfile();
+      return details;
+    } catch (error) {
+      console.error('Failed to fetch user details:', error);
+      return null;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: user ? true : false, login, logout, register, updateProfile }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: user ? true : false, login, logout, register, updateProfile, getUserDetails }}>
       {children}
     </AuthContext.Provider>
   );

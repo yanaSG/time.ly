@@ -66,6 +66,15 @@ export const ROUTES: AppRoute[] = [
     }
   },
   {
+    path: "/profile_setup",
+    element: React.createElement(loadComponent("Setup")),
+    layout: "MainLayout",
+    meta: {
+      // requiresAuth: true,
+      title: "Setup"
+    }
+  },
+  {
     path: "/profile",
     element: React.createElement(loadComponent("Profile")),
     layout: "MainLayout",
@@ -105,7 +114,7 @@ export const NAV_ROUTES: AppRoute[] = [
     }
   },
   {
-    path: "/setup",
+    path: "/profile_setup",
     element: React.createElement(loadComponent("Setup")),
     layout: "MainLayout",
     meta: {

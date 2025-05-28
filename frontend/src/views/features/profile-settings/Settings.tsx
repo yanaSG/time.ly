@@ -1,34 +1,34 @@
 import React, { useState } from 'react'
 
 const Settings = () => {
-  const [profile, setProfile] = useState({
-    name: 'John Doe',
-    email: 'john.doe@email.com',
-    notifications: true,
-    darkMode: false,
-    language: 'en',
-    timezone: 'Asia/Manila',
-    autoSave: true,
-    compactMode: false,
-  });
+//   const [profile, setProfile] = useState({
+//     name: 'John Doe',
+//     email: 'john.doe@email.com',
+//     notifications: true,
+//     darkMode: false,
+//     language: 'en',
+//     timezone: 'Asia/Manila',
+//     autoSave: true,
+//     compactMode: false,
+//   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, type, checked, value } = e.target;
-    setProfile(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-  };
+//   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+//     const { name, type, checked, value } = e.target;
+//     setProfile(prev => ({
+//       ...prev,
+//       [name]: type === 'checkbox' ? checked : value,
+//     }));
+//   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    alert('Settings saved!');
-  };
+//   const handleSubmit = (e: React.FormEvent) => {
+//     e.preventDefault();
+//     alert('Settings saved!');
+//   };
 
   return (
     <div className="w-full min-h-[calc(100vh-2rem)] flex justify-center items-start py-8 px-2 md:px-8 bg-transparent">
       <form
-        onSubmit={handleSubmit}
+        //onSubmit={handleSubmit}
         className="w-full max-w-3xl bg-white/80 rounded-3xl shadow-xl p-8 flex flex-col gap-8"
       >
         <h2 className="text-2xl font-bold text-cyan-700 mb-2">Settings</h2>
@@ -39,8 +39,8 @@ const Settings = () => {
             <input
               type="text"
               name="name"
-              value={profile.name}
-              readOnly
+              // value={profile.name}
+              //readOnly
               className="w-full border rounded px-3 py-2 bg-gray-100 text-gray-500 cursor-not-allowed"
               title="Full name"
               placeholder="Enter your name"
@@ -52,8 +52,8 @@ const Settings = () => {
             <input
               type="email"
               name="email"
-              value={profile.email}
-              readOnly
+              // value={profile.email}
+              //readOnly
               className="w-full border rounded px-3 py-2 bg-gray-100 text-gray-500 cursor-not-allowed"
               title="Email address"
               placeholder="Enter your email"
@@ -69,8 +69,8 @@ const Settings = () => {
               <label className="block text-gray-700 font-semibold mb-1">Language</label>
               <select
                 name="language"
-                value={profile.language}
-                onChange={handleChange}
+                // value={profile.language}
+                //onChange={handleChange}
                 className="w-full border rounded px-3 py-2"
               >
                 <option value="en">English</option>
@@ -82,8 +82,8 @@ const Settings = () => {
               <label className="block text-gray-700 font-semibold mb-1">Timezone</label>
               <select
                 name="timezone"
-                value={profile.timezone}
-                onChange={handleChange}
+                // value={profile.timezone}
+                //onChange={handleChange}
                 className="w-full border rounded px-3 py-2"
               >
                 <option value="Asia/Manila">Asia/Manila</option>
@@ -97,8 +97,8 @@ const Settings = () => {
               <input
                 type="checkbox"
                 name="autoSave"
-                checked={profile.autoSave}
-                onChange={handleChange}
+                // checked={profile.autoSave}
+                //onChange={handleChange}
                 className="w-5 h-5 accent-cyan-700"
                 title="Enable or disable auto-save"
               />
@@ -108,8 +108,8 @@ const Settings = () => {
               <input
                 type="checkbox"
                 name="compactMode"
-                checked={profile.compactMode}
-                onChange={handleChange}
+                // checked={profile.compactMode}
+                //onChange={handleChange}
                 className="w-5 h-5 accent-cyan-700"
                 title="Enable or disable compact mode"
               />
@@ -123,8 +123,8 @@ const Settings = () => {
             <input
               type="checkbox"
               name="notifications"
-              checked={profile.notifications}
-              onChange={handleChange}
+              // checked={profile.notifications}
+              //onChange={handleChange}
               className="w-5 h-5 accent-cyan-700"
               title="Enable or disable email notifications"
             />
@@ -134,8 +134,8 @@ const Settings = () => {
             <input
               type="checkbox"
               name="darkMode"
-              checked={profile.darkMode}
-              onChange={handleChange}
+              // checked={profile.darkMode}
+              //onChange={handleChange}
               className="w-5 h-5 accent-cyan-700"
               title="Enable or disable dark mode"
             />

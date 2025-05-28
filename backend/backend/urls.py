@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/register/', RegisterView.as_view(), name='auth_register'),
     path('api/register/profile/', UserProfileUpdateView.as_view(), name='user_profile_update'),
+    path('api/profile/', UserProfileDetailsView.as_view(), name='user_profile'),
     path('api/login/', LoginView.as_view(), name='auth_login'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path("api/chat/", chat_with_deepseek),

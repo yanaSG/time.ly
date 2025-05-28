@@ -33,15 +33,15 @@ const Login: React.FC = () => {
     //   return;
     // }
 
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long.');
-      return;
-    }
+    // if (formData.password.length < 6) {
+    //   setError('Password must be at least 6 characters long.');
+    //   return;
+    // }
 
-    if (formData.username.length < 6) {
-      setError('Username must be at least 6 characters long.');
-      return;
-    }
+    // if (formData.username.length < 6) {
+    //   setError('Username must be at least 6 characters long.');
+    //   return;
+    // }
 
     try {
       console.log('Sent login data:', formData);
