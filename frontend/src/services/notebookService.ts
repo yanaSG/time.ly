@@ -1,30 +1,37 @@
-import api from '../utils/api'; // uses axios with token handling
+import axios from 'axios';
+import { Notebook } from '../types/Notebook';
 
-interface Notebook {
-  id:number;
-  title:string;
-  content:string;
-}
+const API_URL = 'http://127.0.0.1:8000/api/';
 
-// GET all notebooks
-export const fetchNotebooks=async():Promise<Notebook[]>=>{
-  const res=await api.get('/notebooks/');
-  return res.data;
+const getAll = async (user_id: number): Promise<Notebook[]> => {
+  const response = await axios.post<Notebook[]>(`${API_URL}notebooks/`, user_id);
+  return response.data;
 };
 
-// POST a new notebook
-export const createNotebook=async(notebook:Omit<Notebook,'id'>):Promise<Notebook>=>{
-  const res=await api.post('/notebooks/', notebook);
-  return res.data;
+const getNotebookById = async (id: number): Promise<Notebook | undefined> => {
+  const response = await axios.get<Notebook>(`${API_URL}notebooks/${id}/`);
+  return response.data;
 };
 
-// PUT update notebook
-export const updateNotebook=async(id:number, notebook:Partial<Notebook>):Promise<Notebook>=>{
-  const res=await api.put(`/notebooks/${id}/`, notebook);
-  return res.data;
+const addNotebook = async (notebook: Notebook): Promise<any> => {
+  const response = await axios.post<any>(`${API_URL}notebooks/`, notebook);
+  return response.data;
 };
 
-// DELETE notebook
-export const deleteNotebook=async(id:number)=>{
-  await api.delete(`/notebooks/${id}/`);
+const updateNotebook = async (id: number, notebook: Notebook): Promise<any> => {
+  const response = await axios.post<any>(`${API_URL}notebooks/${id}/books/`, notebook);
+  return response.data;
+};
+
+const deleteNotebook = async (id: number): Promise<any> => {
+  const response = await axios.post<any>(`${API_URL}notebooks/${id}/`);
+  return response.data;
+};
+
+export default {
+  getAll,
+  getNotebookById,
+  addNotebook,
+  deleteNotebook,
+  updateNotebook
 };

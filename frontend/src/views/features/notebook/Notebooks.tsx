@@ -76,9 +76,9 @@ const Notebooks: React.FC = () => {
           }}
           className="flex flex-row z-0 align-center items-center gap-5 p-10 w-full"
         >
-          <div className="flex bg-[#FFD25E] mr-100 p-4 w-1/4.5 items-center align-center justify-center items-start rounded-2xl shadow-lg text-white transition-transform duration-300 hover:scale-105">
+          <div className="flex bg-[#FFD25E] mr-100 p-4 w-1/4.5 align-center justify-center items-start rounded-2xl shadow-lg text-white transition-transform duration-300 hover:scale-105">
             <img 
-              src="../../../../../public/add-notebook.png" 
+              src="/add-notebook.png" 
               alt="Add Notebook" 
               className="h-5 w-5 inline-block mr-2"
             />

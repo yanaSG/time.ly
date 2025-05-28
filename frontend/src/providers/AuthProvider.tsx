@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
 
 interface AuthContextType {
-  user: string;
+  user: { id: number; username: string } | null;
   isAuthenticated: boolean;
   login: (data: { username: string; password: string }) => Promise<void>;
   logout: () => void;
@@ -13,14 +13,14 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<string>('');
+  const [user, setUser] = useState<{id: number, username: string} | null>(null);
   const [_, setToken] = useState(localStorage.getItem('token') || '');
   const navigate = useNavigate();
 
   const login = async (data: { username: string; password: string }) => {
     try {
       const response = await authService.login(data.username, data.password);
-      setUser(response.username);
+      setUser(response.user);
       setToken(response.access);
       localStorage.setItem('access_token', response.access);
       localStorage.setItem('refresh_token', response.refresh);
@@ -33,7 +33,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const register = async (data: { username: string; fname: string; lname: string; email: string; password: string, password2: string }) => {
     try {
       const response = await authService.register(data);
-      setUser(response.username);
+      setUser(response.user);
       setToken(response.access);
       localStorage.setItem('token', response.access);
       navigate('/dashboard');
@@ -44,7 +44,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   const logout = () => {
     authService.logout();
-    setUser('');
+    setUser(null);
     setToken('');
     localStorage.removeItem('token');
     navigate('/login');

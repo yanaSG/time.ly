@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 class CustomUser(AbstractUser):
+    id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=30, unique=True)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=128)
@@ -29,6 +30,7 @@ class Notebook(models.Model):
         return self.title
 
 class Book(models.Model):
+    id = models.AutoField(primary_key=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='books')
     notebook = models.ForeignKey(Notebook, on_delete=models.CASCADE, related_name='books', null=True, blank=True)
     title = models.CharField(max_length=255)
