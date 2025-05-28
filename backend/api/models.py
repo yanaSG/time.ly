@@ -18,21 +18,11 @@ class CustomUser(AbstractUser):
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='user')
 
 class Book(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='books')
     title = models.CharField(max_length=255)
     original_filename = models.CharField(max_length=255, blank=True)
     pdf_data = models.BinaryField()  # BLOB storage
     uploaded_at = models.DateTimeField(auto_now_add=True)
-    domain = models.CharField(max_length=100, choices=[
-        ('cs', 'Computer Science'),
-        ('medicine', 'Medicine'),
-        ('physics', 'Physics'),
-        ('religion', 'Religion'),
-        ('ph', 'Philosophy'),
-        ('math', 'Mathematics'),
-        ('history', 'History'),
-        ('art', 'Art'),
-        ('other', 'Other'),
-    ])
 
     def __str__(self):
         return f"{self.title} ({self.original_filename})"
