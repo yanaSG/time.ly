@@ -64,11 +64,15 @@ class BookUploadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Book
-        fields = ['title', 'pdf_file', 'domain']
+        fields = ['user_id', 'notebook_id', 'title', 'pdf_file', 'domain']
     
     def create(self, validated_data):
         pdf_file = validated_data.pop('pdf_file')
+        user_id = validated_data.get('user_id')
+        notebook_id = validated_data.get('notebook_id')
         return Book.objects.create(
+            user_id=user_id,
+            notebook_id=notebook_id,
             title=validated_data.get('title', pdf_file.name),
             original_filename=pdf_file.name,
             pdf_data=pdf_file.read()
@@ -81,7 +85,7 @@ class BookResponseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Book
-        fields = ['id', 'title', 'original_filename', 'uploaded_at', 'download_url', 'view_url']
+        fields = ['user_id', 'notebook_id', 'title', 'original_filename', 'uploaded_at', 'download_url', 'view_url']
 
     def get_download_url(self, obj):
         request = self.context.get('request')

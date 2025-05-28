@@ -30,6 +30,7 @@ class Notebook(models.Model):
 
 class Book(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='books')
+    notebook = models.ForeignKey(Notebook, on_delete=models.CASCADE, related_name='books', null=True, blank=True)
     title = models.CharField(max_length=255)
     original_filename = models.CharField(max_length=255, blank=True)
     pdf_data = models.BinaryField()  # BLOB storage

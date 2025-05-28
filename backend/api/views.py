@@ -156,7 +156,8 @@ class BookListCreateView(generics.ListCreateAPIView):
                 return Response({"error": "Authentication required to upload a book."}, status=401)
 
             book = Book(
-                user=request.user,
+                user_id=request.data.get('user_id', request.user.id),
+                notebook_id=request.data.get('notebook_id'),
                 original_filename=request.data.get('original_filename', pdf_file.name),
                 title=request.data.get('title', pdf_file.name),
                 pdf_data=pdf_data
