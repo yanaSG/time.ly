@@ -116,10 +116,14 @@ class BookListCreateView(generics.ListCreateAPIView):
         # Start processing (inside atomic transaction)
         try:
             # Create Book instance (not saved yet)
+            if not request.user.is_authenticated:
+                return Response({"error": "Authentication required to upload a book."}, status=401)
+
             book = Book(
+                user=request.user,
+                original_filename=request.data.get('original_filename', pdf_file.name),
                 title=request.data.get('title', pdf_file.name),
-                pdf_data=pdf_data,
-                domain=request.data.get('domain', 'general')
+                pdf_data=pdf_data
             )
             
             # Initialize processor with error handling
