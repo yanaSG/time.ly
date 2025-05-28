@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { getAccessToken, getRefreshToken } from '../utils/tokens'; // Adjust the import path as necessary
+
 
 const API_URL = 'http://127.0.0.1:8000/api/';
 
@@ -45,7 +47,7 @@ const register = async (userData: RegisterData) => {
 };
 
 const updateProfile = async (profileCardData: FormData): Promise<LoginResponse> => {
-  const token = localStorage.getItem('token');
+  const token = getAccessToken();
   const response = await axios.put<LoginResponse>(`${API_URL}register/profile/`, 
     profileCardData,
     {
@@ -59,12 +61,13 @@ const updateProfile = async (profileCardData: FormData): Promise<LoginResponse> 
 };
 
 const getUserProfile = async (): Promise<any> => {
-  const token = localStorage.getItem('token');
+  const token = getAccessToken();
   const response = await axios.get(`${API_URL}profile/`, {
     headers: {
       'Authorization': `Bearer ${token}`
     }
   });
+  
   return response.data;
 };
 
