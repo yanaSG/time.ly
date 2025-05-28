@@ -25,8 +25,8 @@ urlpatterns = [
     path('api/register/', RegisterView.as_view(), name='auth_register'),
     path('api/login/', LoginView.as_view(), name='auth_login'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path("api/chat/", chat_with_gpt),
-    
+    path("api/chat/", chat_with_deepseek),
+    path('notebooks/', NotebookListCreateView.as_view(), name='notebook-list-create'),
     path('books/', BookListCreateView.as_view(), name='document-list'),
     path('books/<int:pk>/', BookDetailView.as_view(), name='document-detail'),
     path('books/<int:pk>/download/', BookDownloadView.as_view(), name='document-download'),

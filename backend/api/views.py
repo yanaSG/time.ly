@@ -12,6 +12,8 @@ from django.shortcuts import get_object_or_404
 from .serializers import *
 from .models import * 
 import openai
+import os
+import requests
 from django.views.decorators.csrf import csrf_exempt
 import json
 import logging
@@ -20,11 +22,48 @@ import PyPDF2
 from .services.pdf_processor import ChapterProcessor
 import pdfplumber
 from django.db import transaction
+from dotenv import load_dotenv
 
+load_dotenv()  # Loads CHUTES_API_TOKEN from .env file
 logger = logging.getLogger(__name__)
 
+@csrf_exempt
+def chat_with_deepseek(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            messages = data.get("messages", [])
 
-openai.api_key = settings.OPENAI_API_KEY
+            api_token = os.getenv("CHUTES_API_TOKEN")
+            if not api_token:
+                return JsonResponse({"error": "API token not found in environment."}, status=500)
+
+            headers = {
+                "Authorization": f"Bearer {api_token}",
+                "Content-Type": "application/json",
+            }
+
+            payload = {
+                "model": "deepseek-ai/DeepSeek-R1",
+                "messages": messages,
+                "stream": False,  # Change to True if handling streaming in future
+                "max_tokens": 1024,
+                "temperature": 0.7
+            }
+
+            response = requests.post(
+                "https://llm.chutes.ai/v1/chat/completions",
+                headers=headers,
+                json=payload
+            )
+
+            response.raise_for_status()
+            return JsonResponse(response.json())
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method"}, status=400)
 
 class RegisterView(generics.CreateAPIView):
     queryset = CustomUser .objects.all()
@@ -70,23 +109,20 @@ class LoginView(generics.GenericAPIView):
             }, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+
+class NotebookListCreateView(generics.ListCreateAPIView):
+    serializer_class = NotebookSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Only return notebooks that belong to the logged-in user
+        return Notebook.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        # Automatically set the user when saving a new notebook
+        serializer.save(user=self.request.user)
         
 
-@csrf_exempt
-def chat_with_gpt(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            messages = data.get("messages", [])
-
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=messages
-            )
-            return JsonResponse(response)
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
-    return JsonResponse({"error": "Invalid request"}, status=400)
 
 class BookListCreateView(generics.ListCreateAPIView):
     queryset = Book.objects.all().order_by('-uploaded_at')
