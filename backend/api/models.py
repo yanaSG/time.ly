@@ -27,6 +27,11 @@ class Book(models.Model):
         ('medicine', 'Medicine'),
         ('physics', 'Physics'),
         ('religion', 'Religion'),
+        ('ph', 'Philosophy'),
+        ('math', 'Mathematics'),
+        ('history', 'History'),
+        ('art', 'Art'),
+        ('other', 'Other'),
     ])
 
     def __str__(self):
@@ -34,21 +39,41 @@ class Book(models.Model):
 
 class BookSummary(models.Model):
     book = models.OneToOneField(Book, on_delete=models.CASCADE, related_name='summary')
-    structured_outline = models.JSONField(help_text="Hierarchical outline with sections")
-    key_definitions = models.JSONField(help_text="Glossary of terms")
-    critical_quotes = models.TextField(blank=True)
-    tl_dr = models.TextField(help_text="One-paragraph summary")
-    processed_at = models.DateTimeField(auto_now_add=True)
-
-    def get_outline_as_markdown(self):
-        return "\n".join(self._generate_markdown(self.structured_outline))
     
-    def _generate_markdown(self, items, level=0):
-        lines = []
-        for item in items:
-            lines.append(f"{'#' * (level + 1)} {item['heading']}")
-            if item.get('summary'):
-                lines.append(item['summary'])
-            if item.get('children'):
-                lines.extend(self._generate_markdown(item['children'], level+1))
-        return lines
+    # Main content storage
+    markdown = models.TextField(blank=True)  # Raw markdown output
+    
+    # Structured data storage
+    sections = models.JSONField(default=list)  # Store processed sections with metadata
+    key_terms = models.JSONField(default=list)  # Extracted key terms with definitions
+    
+    # Metrics
+    page_count = models.IntegerField()
+    processing_time = models.FloatField(null=True, blank=True)  # Track processing duration
+    model_used = models.CharField(max_length=100, default='deepseek-chat')  # Track which model generated this
+    
+    # Status tracking
+    PROCESSING_STATUS = (
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+    )
+    status = models.CharField(max_length=20, choices=PROCESSING_STATUS, default='pending')
+    last_updated = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"Summary of {self.book.title} ({self.status})"
+
+    def get_structured_data(self):
+        """Return parsed data for API responses"""
+        return {
+            'metadata': {
+                'book_id': self.book.id,
+                'pages': self.page_count,
+                'model': self.model_used,
+                'status': self.status
+            },
+            'sections': self.sections,
+            'key_terms': self.key_terms,
+            'full_markdown': self.markdown
+        }

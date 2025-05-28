@@ -60,14 +60,14 @@ class BookUploadSerializer(serializers.ModelSerializer):
         pdf_file = validated_data.pop('pdf_file')
         return Book.objects.create(
             title=validated_data.get('title', pdf_file.name),
-            original_filename=pdf_file.name,  # Store original name
+            original_filename=pdf_file.name,
             pdf_data=pdf_file.read()
         )
 
 class BookResponseSerializer(serializers.ModelSerializer):
     download_url = serializers.SerializerMethodField()
     view_url = serializers.SerializerMethodField()
-    original_filename = serializers.CharField(read_only=True)  # Include in response
+    original_filename = serializers.CharField(read_only=True)
 
     class Meta:
         model = Book
@@ -80,3 +80,8 @@ class BookResponseSerializer(serializers.ModelSerializer):
     def get_view_url(self, obj):
         request = self.context.get('request')
         return request.build_absolute_uri(f'/documents/{obj.id}/view/') if request else None
+    
+class BookSummarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BookSummary
+        fields = '__all__'

@@ -1,8 +1,7 @@
 import io
-from rest_framework import generics, viewsets, status
+from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from rest_framework.decorators import action
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import authenticate
@@ -12,14 +11,15 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 from .serializers import *
 from .models import * 
-import base64
 import openai
 from django.views.decorators.csrf import csrf_exempt
 import json
 import logging
 import urllib
-from .tasks import process_academic_pdf
 import PyPDF2
+from .services.pdf_processor import ChapterProcessor
+import pdfplumber
+from django.db import transaction
 
 logger = logging.getLogger(__name__)
 
@@ -94,27 +94,82 @@ class BookListCreateView(generics.ListCreateAPIView):
     def get_serializer_class(self):
         return BookUploadSerializer if self.request.method == 'POST' else BookResponseSerializer
     
+    @transaction.atomic
     def create(self, request):
         # Validate PDF
         try:
-            PyPDF2.PdfReader(io.BytesIO(request.FILES['pdf'].read()))
-        except:
-            return Response({"error": "Invalid PDF"}, status=400)
+            pdf_file = request.FILES['pdf']
+            pdf_data = pdf_file.read()  # Read once and reuse
+            
+            # Basic PDF validation
+            if not pdf_data.startswith(b'%PDF-'):
+                raise ValueError("Invalid PDF header")
+                
+            # Quick text extraction test
+            with pdfplumber.open(io.BytesIO(pdf_data)) as pdf:
+                if not any(page.extract_text() for page in pdf.pages[:2]):
+                    raise ValueError("No readable text in first 2 pages")
+                    
+        except Exception as e:
+            return Response({"error": f"PDF validation failed: {str(e)}"}, status=400)
 
-        # Save book
-        book = Book.objects.create(
-            title=request.data.get('title'),
-            pdf_data=request.FILES['pdf'].read(),
-            domain=request.data.get('domain')
-        )
-        
-        # Start processing
-        process_academic_pdf.delay(book.id)
-        
-        return Response({
-            "status": "processing_started",
-            "book_id": book.id
-        }, status=202)
+        # Start processing (inside atomic transaction)
+        try:
+            # Create Book instance (not saved yet)
+            book = Book(
+                title=request.data.get('title', pdf_file.name),
+                pdf_data=pdf_data,
+                domain=request.data.get('domain', 'general')
+            )
+            
+            # Initialize processor with error handling
+            processor = ChapterProcessor()
+            result = processor.process(pdf_data)
+            
+            if result['status'] != 'processing_completed':
+                raise RuntimeError(result.get('message', 'Unknown processing error'))
+            
+            # Save book and summary (atomic)
+            book.save()
+            
+            BookSummary.objects.create(
+                book=book,
+                markdown=result.get('markdown', '# Summary\n\nProcessing completed'),
+                sections=result.get('sections', []),  # Changed from 'headings' to 'sections'
+                key_terms=result.get('key_terms', []),
+                page_count=result.get('page_count', 0),
+                processing_time=result.get('processing_time'),  # Added processing_time
+                status='completed',
+                model_used=processor.model_name
+            )
+
+            return Response({
+                "status": "success",
+                "book_id": book.id,
+                "summary": {
+                    "sections": result.get('sections', []),
+                    "key_terms": result.get('key_terms', []),
+                    "page_count": result.get('page_count', 0)
+                }
+            }, status=201)
+
+        except Exception as e:
+            error_type = "processing_error"
+            error_msg = str(e)
+            
+            # Special handling for common cases
+            if "API Error" in error_msg:
+                error_type = "api_error"
+                error_msg = "Summary service unavailable. Please try again later."
+            elif "memory" in error_msg.lower():
+                error_type = "resource_error"
+                error_msg = "Document too large for processing."
+                
+            return Response({
+                "error": error_msg,
+                "type": error_type
+            }, status=400)
+
     
 class BookDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
@@ -182,3 +237,7 @@ class BookViewInBrowser(generics.RetrieveAPIView):
         )
         response['Content-Disposition'] = f'inline; filename="{filename}"; filename*=UTF-8\'\'{encoded_filename}'
         return response
+    
+class BookSummaryDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = BookSummary.objects.all()
+    serializer_class = BookSummarySerializer

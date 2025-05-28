@@ -31,4 +31,5 @@ urlpatterns = [
     path('documents/<int:pk>/', BookDetailView.as_view(), name='document-detail'),
     path('documents/<int:pk>/download/', BookDownloadView.as_view(), name='document-download'),
     path('documents/<int:pk>/view/', BookViewInBrowser.as_view(), name='document-view'),
+    path('documents/<int:pk>/summary/', BookSummaryDetailView.as_view(), name='document-summary-detail'),
 ]
