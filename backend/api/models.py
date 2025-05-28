@@ -10,7 +10,12 @@ class CustomUser(AbstractUser):
     lname = models.CharField(max_length=30, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+    # added fields for user profile
+    image = models.ImageField(upload_to='profile/', blank=True, null=True)
+    course = models.CharField(max_length=100, blank=True, null=True)
+    school = models.CharField(max_length=100, blank=True, null=True)
+    likes = models.PositiveIntegerField(default=0, blank=True, null=True)
+
     ROLE_CHOICES = [
         ('admin', 'Admin'),
         ('user', 'User'),

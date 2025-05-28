@@ -6,3 +6,4 @@ export { default as Notebooks } from "./notebook/Notebooks";
 export { default as Note } from "./notebook/Note";
 export { default as Profile } from "./profile-settings/Profile";
 export { default as Settings } from "./profile-settings/Settings";
+export { default as Setup } from "./profile-setup/Setup";
