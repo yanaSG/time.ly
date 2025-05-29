@@ -54,14 +54,8 @@ const updateProfile = async (profileCardData: FormData, config?: AxiosRequestCon
   return response.data;
 };
 
-const getUserProfile = async (): Promise<any> => {
-  const token = getAccessToken();
-  const response = await axios.get(`${API_URL}profile/`, {
-    headers: {
-      'Authorization': `Bearer ${token}`
-    }
-  });
-  
+const getUserProfile = async (config?: AxiosRequestConfig): Promise<any> => {
+  const response = await api.get(`profile/`, config);
   return response.data;
 };
 

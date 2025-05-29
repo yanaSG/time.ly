@@ -95,7 +95,7 @@ class UserProfileUpdateView(generics.UpdateAPIView):
 
 class UserProfileDetailsView(generics.RetrieveAPIView):
     queryset = CustomUser.objects.all()
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     serializer_class = UserProfileSerializer
 
     def get_object(self):
@@ -129,13 +129,6 @@ class LoginView(generics.GenericAPIView):
             }, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
-
-class CurrentUserView(generics.RetrieveAPIView):
-    serializer_class = CurrentUserSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_object(self):
-        return self.request.user
 
 class NotebookListCreateView(generics.ListCreateAPIView):
     serializer_class = NotebookSerializer

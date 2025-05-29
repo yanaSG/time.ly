@@ -27,7 +27,6 @@ urlpatterns = [
     path('api/profile/', UserProfileDetailsView.as_view(), name='user_profile'),
     path('api/login/', LoginView.as_view(), name='auth_login'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/user/', CurrentUserView.as_view(), name='current_user'),
 
     path("api/chat/", chat_with_deepseek),
 

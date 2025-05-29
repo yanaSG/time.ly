@@ -95,7 +95,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
-        const response = await authService.getCurrentUser();
+        const response = await authService.getUserProfile();
         console.log('Current user:', response);
         setUser(response);
       } catch (error) {
