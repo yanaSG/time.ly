@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Notebook } from '../../../types/Notebook';
 import { useAuth } from '../../../hooks/useAuth';
 import { useNotebooks } from '../../../providers/NotebookProvider';
+import FlashNotif from '../../components/ui/FlashNotif';
 
 const Notebooks: React.FC = () => {
 
@@ -10,7 +11,8 @@ const Notebooks: React.FC = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const { user } = useAuth(); // Get the current user from authentication context
-  const { notebooks, fetchNotebooks, addNotebook, getNotebookById } = useNotebooks(); // Custom hook to manage notebooks
+  const { notebooks, fetchNotebooks, addNotebook, getNotebookById } = useNotebooks();
+  const [flashMessage, setFlashMessage] = useState<string | null>(null);
 
   // Effect to handle body overflow when modal is open
   // This prevents scrolling of the background content when the modal is open
@@ -54,15 +56,14 @@ const Notebooks: React.FC = () => {
 
     try {
       await addNotebook(newNotebook);
-      alert('Notebook created successfully');
       fetchNotebooks();
+      setFlashMessage('Notebook created successfully!');
     } catch (error: any) {
       console.error('Error creating notebook:', error);
-      alert('Failed to create notebook');
+      setFlashMessage('Failed to create notebook');
     }
 
     closeModal();
-
   };
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -87,10 +88,16 @@ const Notebooks: React.FC = () => {
 
   useEffect(() => {
     fetchNotebooks();
-  }, [notebooks, fetchNotebooks]);
+  }, []);
 
   return (
     <div className='fixed'>
+      {flashMessage && (
+        <FlashNotif
+          message={flashMessage}
+          onClose={() => setFlashMessage(null)}
+        />
+      )}
       <div className="flex flex-row ">
         <div className="flex flex-row z-0 align-center items-center gap-5 p-10 w-full">
           <div onClick={openModal}
@@ -128,7 +135,6 @@ const Notebooks: React.FC = () => {
         {notebooks.map((notebook: Notebook) => (
           <div
             key={notebook.id}
-            // onClick={() => window.location.href = `/note/${notebook.id}`}
             onClick={() => handleNotebookClick(notebook.id)}
             className="flex flex-wrap gap-5 transform transition-transform duration-300 hover:scale-105 cursor-pointer"
           >

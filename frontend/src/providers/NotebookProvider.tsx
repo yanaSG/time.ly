@@ -24,17 +24,18 @@ export const NotebookProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const [error, setError] = useState<string | null>(null);
     const { user } = useAuth();
 
-    const fetchNotebooks = useCallback(async () => {
+    const fetchNotebooks = async () => {
         setIsLoading(true);
         try {
             const response = await notebookService.getAll(user!.id);
+            console.log('Fetched notebooks:', response);
             setNotebooks(response);
         } catch (err) {
             setError('Failed to fetch notebooks');
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    };
 
     const getNotebookById = useCallback(async (id: number) => {
         setIsLoading(true);
@@ -89,10 +90,10 @@ export const NotebookProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     };
 
     useEffect(() => {
-        if (user && notebooks) {
+        if (user) {
             fetchNotebooks();
         }
-    }, [user, notebooks]);
+    }, [user]);
 
     return (
         <NotebookContext.Provider value={{
