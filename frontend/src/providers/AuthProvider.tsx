@@ -1,9 +1,9 @@
-import React, { createContext, useState, ReactNode } from 'react';
+import React, { createContext, useState, ReactNode, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
 
 interface AuthContextType {
-  user: string;
+  user: { id: number; username: string } | null;
   isAuthenticated: boolean;
   login: (data: { username: string; password: string }) => Promise<void>;
   logout: () => void;
@@ -31,14 +31,14 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<string>('');
-  const [_, setToken] = useState(localStorage.getItem('token') || '');
+  const [user, setUser] = useState<{id: number, username: string} | null>(null);
+  const [token, setToken] = useState(localStorage.getItem('access_token') || '');
   const navigate = useNavigate();
 
   const login = async (data: { username: string; password: string }) => {
     try {
       const response = await authService.login(data.username, data.password);
-      setUser(response.username);
+      setUser(response.user);
       setToken(response.access);
       localStorage.setItem('access_token', response.access);
       localStorage.setItem('refresh_token', response.refresh);
@@ -66,7 +66,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   }) => {
     try {
       const response = await authService.register(data);
-      setUser(response.username);
+      setUser(response.user);
       setToken(response.access);
       localStorage.setItem('token', response.access);
       navigate('/setup');
@@ -87,11 +87,29 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   const logout = () => {
     authService.logout();
-    setUser('');
+    setUser(null);
     setToken('');
-    localStorage.removeItem('token');
     navigate('/login');
   };
+
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        const response = await authService.getCurrentUser();
+        console.log('Current user:', response);
+        setUser(response);
+      } catch (error) {
+        console.error('Failed to fetch user:', error);
+        setUser(null);
+      }
+    };
+
+    if (token) {
+      checkAuthStatus();
+    } else {
+      setUser(null);
+    }
+  }, [token]);
 
   const getUserDetails = async () => {
     try {

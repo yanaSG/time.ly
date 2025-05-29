@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import *
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+import base64
 
 class RegisterSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)
@@ -76,3 +77,43 @@ class NotebookSerializer(serializers.ModelSerializer):
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
 
+class BookUploadSerializer(serializers.ModelSerializer):
+    pdf_file = serializers.FileField(write_only=True, required=True)
+
+    class Meta:
+        model = Book
+        fields = ['user_id', 'notebook_id', 'title', 'pdf_file', 'domain']
+    
+    def create(self, validated_data):
+        pdf_file = validated_data.pop('pdf_file')
+        user_id = validated_data.get('user_id')
+        notebook_id = validated_data.get('notebook_id')
+        return Book.objects.create(
+            user_id=user_id,
+            notebook_id=notebook_id,
+            title=validated_data.get('title', pdf_file.name),
+            original_filename=pdf_file.name,
+            pdf_data=pdf_file.read()
+        )
+
+class BookResponseSerializer(serializers.ModelSerializer):
+    download_url = serializers.SerializerMethodField()
+    view_url = serializers.SerializerMethodField()
+    original_filename = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Book
+        fields = ['user_id', 'notebook_id', 'title', 'original_filename', 'uploaded_at', 'download_url', 'view_url']
+
+    def get_download_url(self, obj):
+        request = self.context.get('request')
+        return request.build_absolute_uri(f'/documents/{obj.id}/download/') if request else None
+
+    def get_view_url(self, obj):
+        request = self.context.get('request')
+        return request.build_absolute_uri(f'/documents/{obj.id}/view/') if request else None
+    
+class BookSummarySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BookSummary
+        fields = '__all__'

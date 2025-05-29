@@ -27,6 +27,17 @@ urlpatterns = [
     path('api/profile/', UserProfileDetailsView.as_view(), name='user_profile'),
     path('api/login/', LoginView.as_view(), name='auth_login'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/user/', CurrentUserView.as_view(), name='current_user'),
+
     path("api/chat/", chat_with_deepseek),
-    path('notebooks/', NotebookListCreateView.as_view(), name='notebook-list-create'),
+
+    path('api/notebooks/', NotebookListCreateView.as_view(), name='notebook-list-create'),
+    path('api/notebooks/<int:pk>/', NotebookDetailView.as_view(), name='notebook-detail'),
+
+    path('api/notebooks/<int:notebook_id>/books/', BookListCreateView.as_view(), name='document-list'),
+    path('api/notebooks/<int:notebook_id>/books/<int:pk>/', BookDetailView.as_view(), name='document-detail'),
+    path('api/notebooks/<int:notebook_id>/books/<int:pk>/download/', BookDownloadView.as_view(), name='document-download'),
+    path('api/notebooks/<int:notebook_id>/books/<int:pk>/view/', BookViewInBrowser.as_view(), name='document-view'),
+    path('api/notebooks/<int:notebook_id>/books/<int:pk>/summary/', BookSummaryDetailView.as_view(), name='document-summary-detail'),
+    path('api/notebooks/<int:notebook_id>/books/titles/', BookTitleListView.as_view(), name='book-title-list')
 ]

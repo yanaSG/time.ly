@@ -7,25 +7,30 @@ import { IoSettingsSharp } from "react-icons/io5";
 
 interface SideNavLinkProps {
     nav: boolean;
-    path: string;
+    path?: string;
     label: string;
+    onClick?: () => void;
 }
 
-const SideNavLink: React.FC<SideNavLinkProps> = ({ nav, path, label }) => {
+const SideNavLink: React.FC<SideNavLinkProps> = ({ nav, path, label, onClick }) => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const isActive = location.pathname.includes(path);
+    const isActive = location.pathname.includes(path ?? '');
 
     const handleClick = () => {
-        navigate(path);
+        if (onClick) {
+            onClick();
+        } else if (path) {
+            navigate(path);
+        }
     };
 
     return (
         <div
             onClick={handleClick}
             className={`w-full flex items-center justify-start gap-2 p-2 rounded-tr-2xl rounded-br-2xl cursor-pointer text-[#037581] transform transition-all duration-200
-                ${isActive ? 'bg-[#037581] text-white' : 'hover:bg-white'} `}
+                ${isActive ? 'bg-[#037581] text-white' : 'hover:bg-white'} ${path === 'logout' ? 'me-3 ps-5.5' : ''}`}
         >
             <div className='w-8 h-8 items-center justify-center flex ms-3'>
                 {label === 'Dashboard' ? (

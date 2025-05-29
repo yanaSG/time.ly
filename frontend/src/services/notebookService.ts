@@ -1,30 +1,39 @@
-import api from '../utils/api'; // uses axios with token handling
+import { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { api } from '../api/client';
+import { Notebook } from '../types/Notebook';
 
-interface Notebook {
-  id:number;
-  title:string;
-  content:string;
-}
-
-// GET all notebooks
-export const fetchNotebooks=async():Promise<Notebook[]>=>{
-  const res=await api.get('/notebooks/');
-  return res.data;
+const getAll = async (user_id: number, config?: AxiosRequestConfig): Promise<Notebook[]> => {
+  const response = await api.get<Notebook[]>(`notebooks/`, {
+    ...config,
+    params: { user_id } // Send user_id as a query parameter
+  });
+  return response.data;
 };
 
-// POST a new notebook
-export const createNotebook=async(notebook:Omit<Notebook,'id'>):Promise<Notebook>=>{
-  const res=await api.post('/notebooks/', notebook);
-  return res.data;
+const getNotebookById = async (id: number, config?: AxiosRequestConfig): Promise<Notebook | undefined> => {
+  const response = await api.get<Notebook>(`notebooks/${id}/`, config);
+  return response.data;
 };
 
-// PUT update notebook
-export const updateNotebook=async(id:number, notebook:Partial<Notebook>):Promise<Notebook>=>{
-  const res=await api.put(`/notebooks/${id}/`, notebook);
-  return res.data;
+const addNotebook = async (notebook: Omit<Notebook, "id" | "created_at" | "updated_at">, config?: AxiosRequestConfig): Promise<any> => {
+  const response = await api.post<any>(`notebooks/`, notebook, config);
+  return response.data;
 };
 
-// DELETE notebook
-export const deleteNotebook=async(id:number)=>{
-  await api.delete(`/notebooks/${id}/`);
+const updateNotebook = async (id: number, notebook: Notebook, config?: AxiosRequestConfig): Promise<any> => {
+  const response = await api.put<any>(`notebooks/${id}/`, notebook, config);
+  return response.data;
+};
+
+const deleteNotebook = async (id: number, config?: AxiosRequestConfig): Promise<any> => {
+  const response = await api.delete<any>(`notebooks/${id}/`, config);
+  return response.data;
+};
+
+export default {
+  getAll,
+  getNotebookById,
+  addNotebook,
+  deleteNotebook,
+  updateNotebook
 };
