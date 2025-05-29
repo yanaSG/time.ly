@@ -37,18 +37,21 @@ export const NotebookProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
     };
 
-    const getNotebookById = useCallback(async (id: number) => {
+    const getNotebookById = async (id: number) => {
         setIsLoading(true);
         try {
             const response = await notebookService.getNotebookById(id);
-            setCurrentNotebook(response ?? null);
-            return response;
+            console.log('Fetched notebook by ID:', response);
+            if (response) {
+                setCurrentNotebook(response);
+                return response;
+            }
         } catch (err) {
             setError('Notebook not found');
         } finally {
             setIsLoading(false);
         }
-    }, []);
+    };
 
     const addNotebook = async (notebook: Omit<Notebook, "id" | "created_at" | "updated_at">) => {
         setIsLoading(true);

@@ -2,24 +2,33 @@ import React from 'react'
 import { IoArrowUndoOutline } from "react-icons/io5";
 import { FaRegEdit } from "react-icons/fa";
 import UploadButton from '../../components/ui/buttons/UploadButton'
+import { useNavigate } from 'react-router-dom';
 
 interface NoteSideBarProps {
     notebook: string;
     noteTitle: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
-const NoteSideBar: React.FC<NoteSideBarProps> = ({ notebook, noteTitle }) => {
+const NoteSideBar: React.FC<NoteSideBarProps> = ({ notebook, noteTitle, createdAt, updatedAt }) => {
+    const navigate = useNavigate();
+
+    const handleBackClick = () => {
+        navigate('/notebooks');
+    };
+
     return (
         <div className='w-65 h-full p-3 flex flex-col justify-between bg-white/90 rounded-xl shadow-lg'>
             <div className='flex justify-between items-center'>
-                <IoArrowUndoOutline className='text-[#414A4B] size-8 cursor-pointer' />
+                <IoArrowUndoOutline className='text-[#414A4B] size-8 cursor-pointer' onClick={handleBackClick} />
                 <FaRegEdit className='text-[#414A4B] size-5 cursor-pointer' />
             </div>
 
             <div className='flex flex-col gap-3'>
                 <div className='flex flex-col'>
-                    <h6 className='text-[#262F30] text-sm font-semibold'>{notebook}</h6>
-                    <h4 className='text-[#262F30] text-md font-bold'>{noteTitle}</h4>
+                    <h4 className='text-[#262F30] text-md font-bold'>{notebook}</h4>
+                    <h6 className='text-[#262F30] text-sm font-semibold'>{noteTitle}</h6>
                 </div>
 
                 <div className='flex flex-col gap-5'>
@@ -43,9 +52,15 @@ const NoteSideBar: React.FC<NoteSideBarProps> = ({ notebook, noteTitle }) => {
                         </div>
                     </div>
 
-                    <div className='flex gap-2'>
-                        <h6 className='text-[#414A4B]/40 text-xs font-semibold'>Created on</h6>
-                        <p className='text-[#414A4B]/40 text-xs'>2023-10-01</p>
+                    <div>
+                        <div className='flex gap-2'>
+                            <h6 className='text-[#414A4B]/40 text-xs font-semibold'>Created at</h6>
+                            <p className='text-[#414A4B]/40 text-xs'>{createdAt ? new Date(createdAt).toISOString().slice(0, 10) : ''}</p>
+                        </div>
+                        <div className='flex gap-2'>
+                            <h6 className='text-[#414A4B]/40 text-xs font-semibold'>Updated at</h6>
+                            <p className='text-[#414A4B]/40 text-xs'>{updatedAt ? new Date(updatedAt).toISOString().slice(0, 10) : ''}</p>
+                        </div>
                     </div>
                 </div>
 
@@ -59,7 +74,7 @@ const NoteSideBar: React.FC<NoteSideBarProps> = ({ notebook, noteTitle }) => {
 
             <div className='flex flex-col gap-4'>
                 <UploadButton />
-                
+
                 <div className='text-sm text-[#6C7778]'>
                     Page 1 of 1
                 </div>

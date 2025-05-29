@@ -3,8 +3,10 @@ import { Notebook } from '../../../types/Notebook';
 import { useAuth } from '../../../hooks/useAuth';
 import { useNotebooks } from '../../../providers/NotebookProvider';
 import FlashNotif from '../../components/ui/FlashNotif';
+import { useNavigate } from 'react-router-dom';
 
 const Notebooks: React.FC = () => {
+  const navigate = useNavigate(); // Hook to navigate between routes
 
   // State to track created notebooks; each notebook is an object with id, name, and description
   const [showModal, setShowModal] = useState(false);
@@ -36,7 +38,8 @@ const Notebooks: React.FC = () => {
   // Function to handle form submission
   // It creates a new notebook object and adds it to the notebooks state
   const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); // Prevent default form submission behavior
+    event.preventDefault();
+
     if (title.trim() === '') {
       alert('Please enter a title');
       return;
@@ -72,11 +75,15 @@ const Notebooks: React.FC = () => {
     }
   };
 
-  const handleNotebookClick = async (id: number) => {
+  const handleNotebookClick = async (e: React.MouseEvent<HTMLDivElement, MouseEvent>, id: number) => {
+    e.preventDefault();
+
     try {
       const notebook = await getNotebookById(id);
+      console.log('Selected notebook:', notebook);
       if (notebook) {
-        window.location.href = `/note`;
+        console.log('Navigating to note with notebook ID:', notebook.id);
+        navigate('/note');
       } else {
         alert('Notebook not found');
       }
@@ -135,7 +142,7 @@ const Notebooks: React.FC = () => {
         {notebooks.map((notebook: Notebook) => (
           <div
             key={notebook.id}
-            onClick={() => handleNotebookClick(notebook.id)}
+            onClick={(event) => handleNotebookClick(event, notebook.id)}
             className="flex flex-wrap gap-5 transform transition-transform duration-300 hover:scale-105 cursor-pointer"
           >
             <div className="pt-6">

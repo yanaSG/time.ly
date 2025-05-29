@@ -68,7 +68,8 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       const response = await authService.register(data);
       setUser(response.user);
       setToken(response.access);
-      localStorage.setItem('token', response.access);
+      localStorage.setItem('access_token', response.access);
+      localStorage.setItem('refresh_token', response.refresh);
       navigate('/setup');
     } catch (error) {
       console.error('Registration failed:', error);
