@@ -32,6 +32,7 @@ urlpatterns = [
 
     path('api/notebooks/', NotebookListCreateView.as_view(), name='notebook-list-create'),
     path('api/notebooks/<int:pk>/', NotebookDetailView.as_view(), name='notebook-detail'),
+    path('api/notebooks/<int:notebook>/content/', NotebookContentView.as_view(), name='notebook-content'),
 
     path('api/notebooks/<int:notebook_id>/books/', BookListCreateView.as_view(), name='document-list'),
     path('api/notebooks/<int:notebook_id>/books/<int:pk>/', BookDetailView.as_view(), name='document-detail'),

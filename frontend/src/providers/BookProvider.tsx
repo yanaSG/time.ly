@@ -3,7 +3,6 @@ import { Book } from '../types/Book';
 import bookService from '../services/bookService';
 import { useAuth } from '../hooks/useAuth';
 import { useNotebooks } from './NotebookProvider';
-import { UploadResponse } from '../services/bookService';
 
 interface BookContextType {
     books: Book[];
@@ -12,7 +11,7 @@ interface BookContextType {
     error: string | null;
     fetchBooks: () => Promise<void>;
     getBookById: (notebook_id: number, id: number) => Promise<void>;
-    uploadBook: (notebook_id: number, book: FormData) => Promise<UploadResponse | undefined>;
+    uploadBook: (notebook_id: number, book: FormData) => Promise<string | undefined>;
     deleteBook: (notebook_id: number, id: number) => Promise<void>;
     getBookTitles: (notebookId: number, id: number) => Promise<{id: number, title: string}[]>;
     getSummary: (notebookId: number, id: number) => Promise<string>;
@@ -57,7 +56,7 @@ export const BookProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             const response = await bookService.uploadBook(notebook_id, book);
             await fetchBooks();
-            return response;
+            return response.markdown_summary;
         } catch (err) {
             setError('Failed to upload book: ' + err);
         } finally {

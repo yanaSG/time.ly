@@ -33,6 +33,21 @@ class Notebook(models.Model):
 
     def __str__(self):
         return self.title
+    
+    def save(self, *args, **kwargs):
+        is_new = self._state.adding
+        super().save(*args, **kwargs)
+
+        if is_new:
+            NotebookContent.objects.create(notebook=self)
+    
+class NotebookContent(models.Model):
+    notebook = models.OneToOneField(Notebook, on_delete=models.CASCADE, primary_key=True, related_name='content_object')
+    markdown_content = models.TextField(blank=True, default='')
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Content for {self.notebook.title}"
 
 class Book(models.Model):
     id = models.AutoField(primary_key=True)
@@ -48,20 +63,14 @@ class Book(models.Model):
 
 class BookSummary(models.Model):
     book = models.OneToOneField(Book, on_delete=models.CASCADE, related_name='summary')
+    markdown = models.TextField(blank=True)
+    sections = models.JSONField(default=list)
+    key_terms = models.JSONField(default=list)
     
-    # Main content storage
-    markdown = models.TextField(blank=True)  # Raw markdown output
-    
-    # Structured data storage
-    sections = models.JSONField(default=list)  # Store processed sections with metadata
-    key_terms = models.JSONField(default=list)  # Extracted key terms with definitions
-    
-    # Metrics
     page_count = models.IntegerField()
-    processing_time = models.FloatField(null=True, blank=True)  # Track processing duration
-    model_used = models.CharField(max_length=100, default='deepseek-chat')  # Track which model generated this
+    processing_time = models.FloatField(null=True, blank=True)
+    model_used = models.CharField(max_length=100, default='deepseek-chat')
     
-    # Status tracking
     PROCESSING_STATUS = (
         ('pending', 'Pending'),
         ('completed', 'Completed'),

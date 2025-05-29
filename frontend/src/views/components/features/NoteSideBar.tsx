@@ -3,6 +3,7 @@ import { IoArrowUndoOutline } from "react-icons/io5";
 import { FaRegEdit } from "react-icons/fa";
 import UploadButton from '../../components/ui/buttons/UploadButton'
 import { useNavigate } from 'react-router-dom';
+import SaveButton from '../ui/buttons/SaveButton';
 
 interface NoteSideBarProps {
     notebook: string;
@@ -10,9 +11,10 @@ interface NoteSideBarProps {
     createdAt: string;
     updatedAt: string;
     uploadModalClick: () => void;
+    saveButtonClick?: () => void;
 }
 
-const NoteSideBar: React.FC<NoteSideBarProps> = ({ notebook, noteTitle, createdAt, updatedAt, uploadModalClick }) => {
+const NoteSideBar: React.FC<NoteSideBarProps> = ({ notebook, noteTitle, createdAt, updatedAt, uploadModalClick, saveButtonClick }) => {
     const navigate = useNavigate();
 
     const handleBackClick = () => {
@@ -74,6 +76,7 @@ const NoteSideBar: React.FC<NoteSideBarProps> = ({ notebook, noteTitle, createdA
             </div>
 
             <div className='flex flex-col gap-4'>
+                <SaveButton onClick={saveButtonClick} />
                 <UploadButton onClick={uploadModalClick} />
 
                 <div className='text-sm text-[#6C7778]'>

@@ -24,7 +24,7 @@ import pdfplumber
 from django.db import transaction
 from dotenv import load_dotenv
 
-load_dotenv()  # Loads CHUTES_API_TOKEN from .env file
+load_dotenv()
 logger = logging.getLogger(__name__)
 
 @csrf_exempt
@@ -46,7 +46,7 @@ def chat_with_deepseek(request):
             payload = {
                 "model": "deepseek-ai/DeepSeek-R1",
                 "messages": messages,
-                "stream": False,  # Change to True if handling streaming in future
+                "stream": False,
                 "max_tokens": 1024,
                 "temperature": 0.7
             }
@@ -135,22 +135,16 @@ class NotebookListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # Only return notebooks that belong to the logged-in user
         return Notebook.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        # Automatically set the user when saving a new notebook
         serializer.save(user=self.request.user)
 
 class NotebookDetailView(generics.RetrieveUpdateDestroyAPIView):
-    """
-    Handle GET (detail), PUT/PATCH (update), and DELETE operations for a single notebook.
-    """
     serializer_class = NotebookSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # Only allow access to notebooks owned by the logged-in user
         return Notebook.objects.filter(user=self.request.user)
 
     def get_object(self):
@@ -160,7 +154,6 @@ class NotebookDetailView(generics.RetrieveUpdateDestroyAPIView):
         return obj
 
     def perform_update(self, serializer):
-        # Ensure the user cannot change ownership
         serializer.save(user=self.request.user)
 
     def destroy(self, request, *args, **kwargs):
@@ -171,8 +164,13 @@ class NotebookDetailView(generics.RetrieveUpdateDestroyAPIView):
             status=status.HTTP_204_NO_CONTENT
         )
 
+class NotebookContentView(generics.RetrieveUpdateAPIView):
+    queryset = NotebookContent.objects.all()
+    serializer_class = NotebookContentSerializer
+    lookup_field = 'notebook'
+
 class BookListCreateView(generics.ListCreateAPIView):
-    serializer_class = BookResponseSerializer  # Default, override for POST
+    serializer_class = BookResponseSerializer
     permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
@@ -189,25 +187,21 @@ class BookListCreateView(generics.ListCreateAPIView):
     @transaction.atomic
     def create(self, request, *args, **kwargs):
         notebook_id = self.kwargs.get("notebook_id")
-        # Validate PDF
         print("Validating PDF upload...")
         try:
             pdf_file = request.FILES['pdf']
-            pdf_data = pdf_file.read()  # Read once and reuse
+            pdf_data = pdf_file.read()
 
-            # Basic PDF validation
             if not pdf_data.startswith(b'%PDF-'):
                 raise ValueError("Invalid PDF header")
 
-            # Quick text extraction test
             with pdfplumber.open(io.BytesIO(pdf_data)) as pdf:
                 if not any(page.extract_text() for page in pdf.pages[:2]):
                     raise ValueError("No readable text in first 2 pages")
 
         except Exception as e:
             return Response({"error": f"PDF validation failed: {str(e)}"}, status=400)
-
-        # Start processing (inside atomic transaction)
+        
         try:
             if not request.user.is_authenticated:
                 return Response({"error": "Authentication required to upload a book."}, status=401)
@@ -220,14 +214,12 @@ class BookListCreateView(generics.ListCreateAPIView):
                 pdf_data=pdf_data
             )
 
-            # Initialize processor with error handling
             processor = ChapterProcessor()
             result = processor.process(pdf_data)
 
             if result['status'] != 'processing_completed':
                 raise RuntimeError(result.get('message', 'Unknown processing error'))
 
-            # Save book and summary (atomic)
             book.save()
 
             BookSummary.objects.create(
@@ -244,12 +236,18 @@ class BookListCreateView(generics.ListCreateAPIView):
             return Response({
                 "status": "success",
                 "book_id": book.id,
-                "summary": {
-                    "sections": result.get('sections', []),
-                    "key_terms": result.get('key_terms', []),
-                    "page_count": result.get('page_count', 0)
-                }
+                "markdown_summary": result.get('markdown', '')
             }, status=201)
+
+            # return Response({
+            #     "status": "success",
+            #     "book_id": book.id,
+            #     "summary": {
+            #         "sections": result.get('sections', []),
+            #         "key_terms": result.get('key_terms', []),
+            #         "page_count": result.get('page_count', 0)
+            #     }
+            # }, status=201)
 
         except Exception as e:
             error_type = "processing_error"

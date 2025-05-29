@@ -5,11 +5,7 @@ import { Book } from '../types/Book';
 export interface UploadResponse {
   status: "success";
   book_id: string;
-  summary: {
-    sections: string[];
-    key_terms: string[];
-    page_count: number;
-  };
+  markdown_summary: string;
 }
 
 export interface DeleteResponse {

@@ -76,6 +76,12 @@ class NotebookSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
+    
+class NotebookContentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NotebookContent
+        fields = ['notebook', 'markdown_content', 'updated_at']
+        read_only_fields = ['updated_at']
 
 class BookUploadSerializer(serializers.ModelSerializer):
     pdf_file = serializers.FileField(write_only=True, required=True)
