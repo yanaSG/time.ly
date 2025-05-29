@@ -170,7 +170,7 @@ class NotebookDetailView(generics.RetrieveUpdateDestroyAPIView):
             {"message": "Notebook deleted successfully"},
             status=status.HTTP_204_NO_CONTENT
         )
- 
+
 class BookListCreateView(generics.ListCreateAPIView):
     serializer_class = BookResponseSerializer  # Default, override for POST
     permission_classes = [IsAuthenticated]
@@ -190,6 +190,7 @@ class BookListCreateView(generics.ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         notebook_id = self.kwargs.get("notebook_id")
         # Validate PDF
+        print("Validating PDF upload...")
         try:
             pdf_file = request.FILES['pdf']
             pdf_data = pdf_file.read()  # Read once and reuse
@@ -214,8 +215,8 @@ class BookListCreateView(generics.ListCreateAPIView):
             book = Book(
                 user=request.user,
                 notebook_id=notebook_id,
-                original_filename=request.data.get('original_filename', pdf_file.name),
-                title=request.data.get('title', pdf_file.name),
+                original_filename=pdf_file.name,
+                title=pdf_file.name,
                 pdf_data=pdf_data
             )
 
@@ -260,6 +261,9 @@ class BookListCreateView(generics.ListCreateAPIView):
             elif "memory" in error_msg.lower():
                 error_type = "resource_error"
                 error_msg = "Document too large for processing."
+
+            print(f"Error processing book: {error_msg}")
+            print(f"Error type: {error_type}")
 
             return Response({
                 "error": error_msg,

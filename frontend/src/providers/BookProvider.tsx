@@ -12,7 +12,7 @@ interface BookContextType {
     error: string | null;
     fetchBooks: () => Promise<void>;
     getBookById: (notebook_id: number, id: number) => Promise<void>;
-    uploadBook: (notebook_id: number, book: { user_id: number, notebook_id: number, title: string, pdf_file: Blob }) => Promise<UploadResponse | undefined>;
+    uploadBook: (notebook_id: number, book: FormData) => Promise<UploadResponse | undefined>;
     deleteBook: (notebook_id: number, id: number) => Promise<void>;
     getBookTitles: (notebookId: number, id: number) => Promise<{id: number, title: string}[]>;
     getSummary: (notebookId: number, id: number) => Promise<string>;
@@ -52,14 +52,14 @@ export const BookProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }, []);
 
-    const uploadBook = async (notebook_id: number, book: { user_id: number, notebook_id: number, title: string, pdf_file: Blob }) => {
+    const uploadBook = async (notebook_id: number, book: FormData) => {
         setIsLoading(true);
         try {
             const response = await bookService.uploadBook(notebook_id, book);
             await fetchBooks();
             return response;
         } catch (err) {
-            setError('Failed to upload book');
+            setError('Failed to upload book: ' + err);
         } finally {
             setIsLoading(false);
         }

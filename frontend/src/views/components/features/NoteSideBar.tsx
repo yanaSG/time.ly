@@ -9,9 +9,10 @@ interface NoteSideBarProps {
     noteTitle: string;
     createdAt: string;
     updatedAt: string;
+    uploadModalClick: () => void;
 }
 
-const NoteSideBar: React.FC<NoteSideBarProps> = ({ notebook, noteTitle, createdAt, updatedAt }) => {
+const NoteSideBar: React.FC<NoteSideBarProps> = ({ notebook, noteTitle, createdAt, updatedAt, uploadModalClick }) => {
     const navigate = useNavigate();
 
     const handleBackClick = () => {
@@ -73,7 +74,7 @@ const NoteSideBar: React.FC<NoteSideBarProps> = ({ notebook, noteTitle, createdA
             </div>
 
             <div className='flex flex-col gap-4'>
-                <UploadButton />
+                <UploadButton onClick={uploadModalClick} />
 
                 <div className='text-sm text-[#6C7778]'>
                     Page 1 of 1

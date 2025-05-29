@@ -34,7 +34,7 @@ const getBookById = async (notebook_id: number, id: number, config?: AxiosReques
   return response.data;
 };
 
-const uploadBook = async (notebook_id: number, book: { user_id: number, notebook_id: number, title: string, pdf_file: Blob }, config?: AxiosRequestConfig): Promise<UploadResponse> => {
+const uploadBook = async (notebook_id: number, book: FormData, config?: AxiosRequestConfig): Promise<UploadResponse> => {
   const response = await api.post<UploadResponse>(`notebooks/${notebook_id}/books/`, book, config);
   return response.data;
 };
