@@ -68,14 +68,31 @@ const ChatProvider: React.FC<{children: ReactNode}> = ({children}) => {
     setMessages(updatedMessages);
     setUserInput("");
 
+    // add
+    // Optimistically add a loading assistant message
+    const loadingMessage = { role: "assistant" as "assistant", content: "..." };
+    setMessages(prev => [...prev, loadingMessage]);
+    let loadingIndex = updatedMessages.length; // index of the loading message
+
     try {
       // Use chatService.chatbot instead of api.post directly
-    const res = await chatService.chatbot(updatedMessages);
+      const res = await chatService.chatbot(updatedMessages);
 
-    const assistantReply = res?.choices?.[0]?.message?.content || "No reply.";
-    setMessages(prev => [...prev, { role: "assistant", content: assistantReply }]);
+      const assistantReply = res?.choices?.[0]?.message?.content || "No reply.";
+      //setMessages(prev => [...prev, { role: "assistant", content: assistantReply }]);
+      setMessages(prev => {
+        const newMessages = [...prev];
+        newMessages[loadingIndex] = { role: "assistant", content: assistantReply };
+        return newMessages;
+      });
 
     } catch (err) {
+      //console.error("Chat API error:", err);
+        setMessages(prev => {
+          const newMessages = [...prev];
+          newMessages[loadingIndex] = { role: "assistant", content: "Sorry, something went wrong." };
+          return newMessages;
+      });
       console.error("Chat API error:", err);
     }
   };
@@ -95,4 +112,5 @@ const ChatProvider: React.FC<{children: ReactNode}> = ({children}) => {
 };
 
 export { ChatProvider, ChatContext };
+export type { Message };
 
