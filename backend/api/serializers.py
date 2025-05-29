@@ -51,6 +51,11 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
             'likes': {'required': False},
         }
         
+class CurrentUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'username']
+
 class ObtainTokenSerializer(TokenObtainPairSerializer):
     username = serializers.CharField(required=True)
     password = serializers.CharField(write_only=True, required=True)

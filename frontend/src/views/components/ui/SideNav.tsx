@@ -2,16 +2,19 @@ import React, { useState } from 'react'
 import { NAV_ROUTES } from '../../../routes/routes';
 import SideNavLink from './SideNavLink'
 import { FaArrowRightToBracket, FaArrowRightFromBracket } from "react-icons/fa6";
+import { useAuth } from '../../../hooks/useAuth';
 
 const SideNav: React.FC = () => {
   const logoShortPath = '/logo-short-1.png';
   const logoPath = '/logo-1.png';
 
   const [openNav, setOpenNav] = useState(true);
+  const { logout } = useAuth();
 
   const toggleNav = () => {
     setOpenNav(!openNav);
   };
+
 
   return (
     <div className={`h-screen flex flex-col justify-between items-center bg-[#EDEDED] transform transition-all duration-300
@@ -34,6 +37,7 @@ const SideNav: React.FC = () => {
           }
         </div>
       </div>
+      <SideNavLink nav={openNav} path='logout' label={'Logout'} onClick={logout} />
       <div onClick={toggleNav}
         className={`w-[80%] text-[#037581] p-2 mb-5 flex items-center justify-center gap-2 rounded-full cursor-pointer hover:text-white hover:bg-[#037581] transform transition-all duration-200
           ${openNav ? 'sm:w-[25%] sm:me-5' : ''}`}>

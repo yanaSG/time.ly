@@ -66,7 +66,7 @@ def chat_with_deepseek(request):
     return JsonResponse({"error": "Invalid request method"}, status=400)
 
 class RegisterView(generics.CreateAPIView):
-    queryset = CustomUser .objects.all()
+    queryset = CustomUser.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
 
@@ -87,7 +87,7 @@ class RegisterView(generics.CreateAPIView):
 
 class UserProfileUpdateView(generics.UpdateAPIView):
     queryset = CustomUser.objects.all()
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     serializer_class = UserProfileUpdateSerializer
 
     def get_object(self):
@@ -121,9 +121,16 @@ class LoginView(generics.GenericAPIView):
         else:
             return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
+class CurrentUserView(generics.RetrieveAPIView):
+    serializer_class = CurrentUserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
 class NotebookListCreateView(generics.ListCreateAPIView):
     serializer_class = NotebookSerializer
-    permission_classes = IsAuthenticated
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         # Only return notebooks that belong to the logged-in user

@@ -1,6 +1,5 @@
-import axios from 'axios';
-
-const API_URL = 'http://127.0.0.1:8000/api/';
+import { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { api } from '../api/client';
 
 interface LoginResponse {
   user : {
@@ -33,39 +32,36 @@ interface RegisterData {
 //   likes: BigInt;
 // }
 
-const login = async (username: string, password: string): Promise<LoginResponse> => {
-  const response = await axios.post<LoginResponse>(`${API_URL}login/`, { username, password });
+const login = async (username: string, password: string, config?: AxiosRequestConfig): Promise<LoginResponse> => {
+  const response = await api.post<LoginResponse>(`login/`, { username, password }, config);
   return response.data;
 };
 
 const logout = (): void => {
-  localStorage.removeItem('token');
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
 };
 
-const register = async (userData: RegisterData) => {
-  const response = await axios.post<LoginResponse>(`${API_URL}register/`, userData);
+const register = async (userData: RegisterData, config?: AxiosRequestConfig) => {
+  const response = await api.post<LoginResponse>(`register/`, userData, config);
   return response.data;
 };
 
-const updateProfile = async (profileCardData: FormData): Promise<LoginResponse> => {
-  const token = localStorage.getItem('token');
-  const response = await axios.put<LoginResponse>(`${API_URL}register/profile/`, 
-    profileCardData,
-    {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'multipart/form-data'
-      }
-    }
-  );
+const updateProfile = async (profileCardData: FormData, config?: AxiosRequestConfig): Promise<LoginResponse> => {
+  const response = await api.put<LoginResponse>(`register/profile/`, profileCardData, config);
   return response.data;
 };
 
-
+const getCurrentUser = async (config?: AxiosRequestConfig): Promise<any> => {
+  const response = await api.get<any>(`user/`, config);
+  console.log('Current user (authService):', response.data);
+  return response.data;
+};
 
 export default {
   login,
   logout,
   register,
-  updateProfile
+  updateProfile,
+  getCurrentUser
 };

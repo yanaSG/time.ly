@@ -1,4 +1,4 @@
-import React, { createContext, useState, ReactNode } from 'react';
+import React, { createContext, useState, ReactNode, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
 
@@ -29,7 +29,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<{id: number, username: string} | null>(null);
-  const [_, setToken] = useState(localStorage.getItem('token') || '');
+  const [token, setToken] = useState(localStorage.getItem('access_token') || '');
   const navigate = useNavigate();
 
   const login = async (data: { username: string; password: string }) => {
@@ -84,9 +84,27 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     authService.logout();
     setUser(null);
     setToken('');
-    localStorage.removeItem('token');
     navigate('/login');
   };
+
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        const response = await authService.getCurrentUser();
+        console.log('Current user:', response);
+        setUser(response);
+      } catch (error) {
+        console.error('Failed to fetch user:', error);
+        setUser(null);
+      }
+    };
+
+    if (token) {
+      checkAuthStatus();
+    } else {
+      setUser(null);
+    }
+  }, [token]);
 
   return (
     <AuthContext.Provider value={{ user, isAuthenticated: user ? true : false, login, logout, register, updateProfile }}>

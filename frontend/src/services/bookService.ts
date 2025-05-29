@@ -1,7 +1,6 @@
-import axios from 'axios';
+import { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { api } from '../api/client';
 import { Book } from '../types/Book';
-
-const API_URL = 'http://127.0.0.1:8000/api/';
 
 export interface UploadResponse {
   status: "success";
@@ -25,33 +24,33 @@ export interface summaryResponse {
   markdown: string;
 }
 
-const getAll = async (notebook_id: number, userId: number): Promise<Book[]> => {
-  const response = await axios.post<Book[]>(`${API_URL}notebooks/${notebook_id}/books/`, { user_id: userId });
+const getAll = async (notebook_id: number, userId: number, config?: AxiosRequestConfig): Promise<Book[]> => {
+  const response = await api.post<Book[]>(`notebooks/${notebook_id}/books/`, { user_id: userId }, config);
   return response.data;
 };
 
-const getBookById = async (notebook_id: number, id: number): Promise<Book> => {
-  const response = await axios.get<Book>(`${API_URL}notebooks/${notebook_id}/books/${id}/`);
+const getBookById = async (notebook_id: number, id: number, config?: AxiosRequestConfig): Promise<Book> => {
+  const response = await api.get<Book>(`notebooks/${notebook_id}/books/${id}/`, config);
   return response.data;
 };
 
-const uploadBook = async (notebook_id: number, book: { user_id: number, notebook_id: number, title: string, pdf_file: Blob }): Promise<UploadResponse> => {
-  const response = await axios.post<UploadResponse>(`${API_URL}notebooks/${notebook_id}/books/`, book);
+const uploadBook = async (notebook_id: number, book: { user_id: number, notebook_id: number, title: string, pdf_file: Blob }, config?: AxiosRequestConfig): Promise<UploadResponse> => {
+  const response = await api.post<UploadResponse>(`notebooks/${notebook_id}/books/`, book, config);
   return response.data;
 };
 
-const deleteBook = async (notebook_id: number, id: number): Promise<DeleteResponse> => {
-  const response = await axios.post<DeleteResponse>(`${API_URL}notebooks/${notebook_id}/books/${id}/`);
+const deleteBook = async (notebook_id: number, id: number, config?: AxiosRequestConfig): Promise<DeleteResponse> => {
+  const response = await api.post<DeleteResponse>(`notebooks/${notebook_id}/books/${id}/`, config);
   return response.data;
 };
 
-const getBookTitles = async (id: number): Promise<titleListResponse> => {
-  const response = await axios.post<titleListResponse>(`${API_URL}notebooks/${id}/books/titles/`);
+const getBookTitles = async (id: number, config?: AxiosRequestConfig): Promise<titleListResponse> => {
+  const response = await api.post<titleListResponse>(`notebooks/${id}/books/titles/`, config);
   return response.data;
 };
 
-const getSummary = async (notebook_id: number, id: number): Promise<summaryResponse> => {
-  const response = await axios.post<summaryResponse>(`${API_URL}notebooks/${notebook_id}/books/${id}/summary/`);
+const getSummary = async (notebook_id: number, id: number, config?: AxiosRequestConfig): Promise<summaryResponse> => {
+  const response = await api.post<summaryResponse>(`notebooks/${notebook_id}/books/${id}/summary/`, config);
   return response.data;
 };
 

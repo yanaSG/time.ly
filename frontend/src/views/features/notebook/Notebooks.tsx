@@ -1,27 +1,24 @@
-import React, { useEffect, useState }from 'react'
-
-interface Notebook{
-  id: number;
-  name: string;
-  description: string;
-}
+import React, { useEffect, useState } from 'react'
+import { Notebook } from '../../../types/Notebook';
+import { useAuth } from '../../../hooks/useAuth';
+import { useNotebooks } from '../../../providers/NotebookProvider';
 
 const Notebooks: React.FC = () => {
-  
-  // State to track created notebooks; each notebook is an object with id, name, and description
-  const [notebooks, setNotebooks] = useState<Notebook[]>([]);
-  const [showModal, setShowModal] = useState(false);
 
+  // State to track created notebooks; each notebook is an object with id, name, and description
+  const [showModal, setShowModal] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const { user } = useAuth(); // Get the current user from authentication context
+  const { notebooks, fetchNotebooks, addNotebook, getNotebookById } = useNotebooks(); // Custom hook to manage notebooks
 
   // Effect to handle body overflow when modal is open
   // This prevents scrolling of the background content when the modal is open
   useEffect(() => {
-    if(showModal){
-      document.body.style.overflow='hidden';
-    }else{
-      document.body.style.overflow='';
+    if (showModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
     }
   }, [showModal]);
 
@@ -36,50 +33,78 @@ const Notebooks: React.FC = () => {
 
   // Function to handle form submission
   // It creates a new notebook object and adds it to the notebooks state
-  const handleFormSubmit = (e: React.FormEvent) => {
-
-    if(title.trim()===''){
+  const handleFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault(); // Prevent default form submission behavior
+    if (title.trim() === '') {
       alert('Please enter a title');
       return;
     }
 
-    const newNotebook: Notebook = {
-      id: notebooks.length,
-      name: title.trim(),
+    if (user === null) {
+      alert('You must be logged in to create a notebook');
+      console.log(user);
+      return;
+    }
+    console.log(user);
+    const newNotebook: Omit<Notebook, "id" | "created_at" | "updated_at"> = {
+      user_id: user.id,
+      title: title.trim(),
       description: description.trim(),
     };
 
-    setNotebooks(prev => [...prev, newNotebook]);
+    try {
+      await addNotebook(newNotebook);
+      alert('Notebook created successfully');
+      fetchNotebooks();
+    } catch (error: any) {
+      console.error('Error creating notebook:', error);
+      alert('Failed to create notebook');
+    }
+
     closeModal();
 
   };
 
-
-  // Close modal on clicking outside form
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (e.target === e.currentTarget) {
       closeModal();
     }
   };
 
+  const handleNotebookClick = async (id: number) => {
+    try {
+      const notebook = await getNotebookById(id);
+      if (notebook) {
+        window.location.href = `/note`;
+      } else {
+        alert('Notebook not found');
+      }
+    } catch (error) {
+      console.error('Error fetching notebook:', error);
+      alert('Failed to fetch notebook');
+    }
+  };
+
+  useEffect(() => {
+    fetchNotebooks();
+  }, [notebooks, fetchNotebooks]);
 
   return (
-    <div>
+    <div className='fixed'>
       <div className="flex flex-row ">
-        <div onClick={openModal}
-          role="button"
-          tabIndex={0}
-          onKeyDown={e => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              openModal();
-            }
-          }}
-          className="flex flex-row z-0 align-center items-center gap-5 p-10 w-full"
-        >
-          <div className="flex bg-[#FFD25E] mr-100 p-4 w-1/4.5 align-center justify-center items-start rounded-2xl shadow-lg text-white transition-transform duration-300 hover:scale-105">
-            <img 
-              src="/add-notebook.png" 
-              alt="Add Notebook" 
+        <div className="flex flex-row z-0 align-center items-center gap-5 p-10 w-full">
+          <div onClick={openModal}
+            role="button"
+            tabIndex={0}
+            onKeyDown={e => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                openModal();
+              }
+            }}
+            className="flex bg-[#FFD25E] mr-100 p-4 w-1/4.5 align-center justify-center items-start rounded-2xl shadow-lg text-white transition-transform duration-300 hover:scale-105 cursor-pointer">
+            <img
+              src="/add-notebook.png"
+              alt="Add Notebook"
               className="h-5 w-5 inline-block mr-2"
             />
             <p>Add New Notebook</p>
@@ -87,47 +112,47 @@ const Notebooks: React.FC = () => {
         </div>
 
         <div className="p-4 w-1/2 flex justify-end items-center">
-          <input 
-            type="text" 
-            placeholder="Search Notebooks..." 
+          <input
+            type="text"
+            placeholder="Search Notebooks..."
             className="w-100 p-3 h-1/2 rounded-full border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FFD25E]"
           />
-          <button className="bg-[#FFD25E] h-1/2 text-white rounded-full px-4 py-2 ml-2 hover:bg-[#E6B84F] transition-transform duration-300 hover:scale-105">
+          <button className="bg-[#FFD25E] h-1/2 text-white rounded-full px-4 py-2 ml-2 hover:bg-[#E6B84F] transition-transform duration-300 hover:scale-105 cursor-pointer">
             Search
           </button>
         </div>
       </div>
-        {/* notebooks */}
-      <div className="flex flex-row gap-5 pt-10">
+      {/* notebooks */}
+      <div className="h-full w-full grid grid-cols-6 gap-5 pt-5 px-10">
 
-        {notebooks.map(notebook => (
-            <div
+        {notebooks.map((notebook: Notebook) => (
+          <div
             key={notebook.id}
             // onClick={() => window.location.href = `/note/${notebook.id}`}
-            onClick={() => window.location.href = `/note`}
-            className="flex flex-row gap-5 transform transition-transform duration-300 hover:scale-105 cursor-pointer"
-            >
+            onClick={() => handleNotebookClick(notebook.id)}
+            className="flex flex-wrap gap-5 transform transition-transform duration-300 hover:scale-105 cursor-pointer"
+          >
             <div className="pt-6">
-              <img 
-              src="/binder.png" 
-              alt="Dashboard Illustration" 
-              className="absolute pl-2 h-42 w-auto z-0"
+              <img
+                src="/binder.png"
+                alt="Dashboard Illustration"
+                className="absolute pl-2 h-42 w-auto z-0"
               />
             </div>
-            <div className="pl-4 pr- 5 flex flex-col justify-center bg-[#FFD25E] h-55 w-40 rounded-2xl z-10 shadow-lg pl-2">
-              <h3 className="text-xl font-bold text-white">{notebook.name}</h3>
+            <div className="pl-4 pr- 5 flex flex-col justify-center bg-[#FFD25E] h-55 w-40 rounded-2xl z-10 shadow-lg">
+              <h3 className="text-xl font-bold text-white">{notebook.title}</h3>
               <p className="text-white text-sm">{notebook.description}</p>
             </div>
-            </div>
+          </div>
         ))}
       </div>
 
       {/* Modal for creating a new notebook */}
-      {showModal && ( 
+      {showModal && (
         <div
-        // Overlay to close modal on click
+          // Overlay to close modal on click
           onClick={handleOverlayClick}
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black/20 flex items-center justify-center z-50"
           aria-modal="true"
           role="dialog"
           // Accessibility attributes for screen readers
@@ -135,7 +160,7 @@ const Notebooks: React.FC = () => {
           aria-describedby="modal-description"
         >
 
-        <form
+          <form
             onSubmit={handleFormSubmit}
             className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 mx-4"
             onClick={e => e.stopPropagation()} // Prevent click propagation to overlay
@@ -152,7 +177,6 @@ const Notebooks: React.FC = () => {
                 value={title}
                 onChange={e => setTitle(e.target.value)}
                 placeholder="Enter notebook title"
-                required
                 autoFocus
               />
             </div>
@@ -176,13 +200,13 @@ const Notebooks: React.FC = () => {
                 type="button"
                 // Close modal on click
                 onClick={closeModal}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-yellow-400 text-white font-semibold rounded hover:bg-yellow-500 transition"
+                className="px-4 py-2 bg-yellow-400 text-white font-semibold rounded hover:bg-yellow-500 transition cursor-pointer"
               >
                 Add Notebook
               </button>
@@ -190,8 +214,8 @@ const Notebooks: React.FC = () => {
 
           </form>
         </div>
-        )}
-    
+      )}
+
     </div>
   )
 }

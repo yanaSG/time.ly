@@ -1,30 +1,32 @@
-import axios from 'axios';
+import { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { api } from '../api/client';
 import { Notebook } from '../types/Notebook';
 
-const API_URL = 'http://127.0.0.1:8000/api/';
-
-const getAll = async (user_id: number): Promise<Notebook[]> => {
-  const response = await axios.post<Notebook[]>(`${API_URL}notebooks/`, user_id);
+const getAll = async (user_id: number, config?: AxiosRequestConfig): Promise<Notebook[]> => {
+  const response = await api.get<Notebook[]>(`notebooks/`, {
+    ...config,
+    params: { user_id } // Send user_id as a query parameter
+  });
   return response.data;
 };
 
-const getNotebookById = async (id: number): Promise<Notebook | undefined> => {
-  const response = await axios.get<Notebook>(`${API_URL}notebooks/${id}/`);
+const getNotebookById = async (id: number, config?: AxiosRequestConfig): Promise<Notebook | undefined> => {
+  const response = await api.get<Notebook>(`notebooks/${id}/`, config);
   return response.data;
 };
 
-const addNotebook = async (notebook: Notebook): Promise<any> => {
-  const response = await axios.post<any>(`${API_URL}notebooks/`, notebook);
+const addNotebook = async (notebook: Omit<Notebook, "id" | "created_at" | "updated_at">, config?: AxiosRequestConfig): Promise<any> => {
+  const response = await api.post<any>(`notebooks/`, notebook, config);
   return response.data;
 };
 
-const updateNotebook = async (id: number, notebook: Notebook): Promise<any> => {
-  const response = await axios.post<any>(`${API_URL}notebooks/${id}/books/`, notebook);
+const updateNotebook = async (id: number, notebook: Notebook, config?: AxiosRequestConfig): Promise<any> => {
+  const response = await api.put<any>(`notebooks/${id}/`, notebook, config);
   return response.data;
 };
 
-const deleteNotebook = async (id: number): Promise<any> => {
-  const response = await axios.post<any>(`${API_URL}notebooks/${id}/`);
+const deleteNotebook = async (id: number, config?: AxiosRequestConfig): Promise<any> => {
+  const response = await api.delete<any>(`notebooks/${id}/`, config);
   return response.data;
 };
 

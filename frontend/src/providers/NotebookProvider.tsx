@@ -10,7 +10,7 @@ interface NotebookContextType {
     error: string | null;
     fetchNotebooks: () => Promise<void>;
     getNotebookById: (id: number) => Promise<Notebook | undefined>;
-    addNotebook: (notebook: Notebook) => Promise<any>;
+    addNotebook: (notebook: Omit<Notebook, "id" | "created_at" | "updated_at">) => Promise<any>;
     updateNotebook: (id: number, notebook: Notebook) => Promise<any>;
     deleteNotebook: (id: number) => Promise<any>;
 }
@@ -49,7 +49,7 @@ export const NotebookProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
     }, []);
 
-    const addNotebook = async (notebook: Notebook) => {
+    const addNotebook = async (notebook: Omit<Notebook, "id" | "created_at" | "updated_at">) => {
         setIsLoading(true);
         try {
             const response = await notebookService.addNotebook(notebook);
@@ -89,10 +89,10 @@ export const NotebookProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     };
 
     useEffect(() => {
-        if (user && currentNotebook) {
+        if (user && notebooks) {
             fetchNotebooks();
         }
-    }, [user, currentNotebook]);
+    }, [user, notebooks]);
 
     return (
         <NotebookContext.Provider value={{
