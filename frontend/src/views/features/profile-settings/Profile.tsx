@@ -4,6 +4,18 @@ import { Dialog } from '@headlessui/react'
 
 const Profile = () => {
   const [modal, setModal]=useState<null | 'edit' | 'email' | 'password' | 'passkey'>(null)
+const [profileForm, setProfileForm] = useState({
+  username: 'Johanne',
+  email: 'johanne@email.com',
+  firstName: 'Johanne',
+  lastName: 'Nacorda',
+  school: 'University of San Jose-Recoletos',
+  course: 'BS Computer Science',
+  likes: 'Coding, Music, Reading',
+  bio: 'Passionate learner and note-taker.',
+  image: null as File | null,
+});
+  const [error, setError] = useState('');
 
   const renderModalContent = () => {
     switch (modal) {
@@ -12,37 +24,93 @@ const Profile = () => {
           <>
           <Dialog.Title className="text-xl font-bold mb-4">Edit Profile</Dialog.Title>
 
-          <form className="flex flex-col gap-4">
-            <div className="flex flex-col items-center gap-2">
-      <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center border-2 border-yellow-200">
-        <FaRegUser className="text-gray-400" size={40} />
+          <div
+  className="bg-white rounded-4xl shadow-xl p-10 flex flex-row gap-10 items-start"
+  style={{ minWidth: 900, maxWidth: 1100 }}
+>
+  {/* Left: Profile Image & File Input */}
+  <div className="flex flex-col w-1/3 min-w-[250px] h-[500px] justify-center items-center">
+    <div className="flex flex-col items-center w-full">
+      <div className="w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center border-4 border-yellow-200 mb-4 shadow">
+        <FaRegUser className="text-gray-400" size={72} />
       </div>
-      <input type="file" accept="image/*" className="text-sm" placeholder='Upload profile photo' />
-      <span className="text-xs text-gray-500">Add or change your profile photo</span>
+      <label className="flex flex-col items-center cursor-pointer w-full group">
+        <span className="text-base mb-2 text-center font-semibold text-cyan-700 group-hover:underline transition">
+          {profileForm.image ? profileForm.image.name : "Choose File"}
+        </span>
+        <input
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={e =>
+            setProfileForm(prev => ({
+              ...prev,
+              image: e.target.files ? e.target.files[0] : null,
+            }))
+          }
+        />
+      </label>
+      <span className="text-xs text-gray-400 mb-2 text-center">
+        Add or change your profile photo
+      </span>
     </div>
-    {/* Username */}
-    <input
-      type="text"
-      placeholder="Username"
-      className="border rounded px-3 py-2"
-    />
-    {/* First Name */}
-    <input
-      type="text"
-      placeholder="First Name"
-      className="border rounded px-3 py-2"
-    />
-    {/* Last Name */}
-    <input
-      type="text"
-      placeholder="Last Name"
-      className="border rounded px-3 py-2"
-    />
-    <div className="flex gap-2 mt-4">
-      <button type="submit" className="bg-cyan-700 text-white px-4 py-2 rounded">Save</button>
-      <button type="button" className="bg-gray-200 px-4 py-2 rounded" onClick={() => setModal(null)}>Cancel</button>
+  </div>
+
+  {/* Divider */}
+  <div className="w-px bg-gray-200 self-stretch mx-2" />
+
+  {/* Right: Edit Form */}
+  <form
+    className="flex flex-col gap-4 w-2/3"
+    onSubmit={async (e) => {
+      e.preventDefault();
+      try {
+        const data = new FormData();
+        data.append('username', profileForm.username);
+        data.append('first_name', profileForm.firstName);
+        data.append('last_name', profileForm.lastName);
+        data.append('school', profileForm.school);
+        data.append('course', profileForm.course);
+        data.append('likes', profileForm.likes);
+        data.append('bio', profileForm.bio || '');
+        if (profileForm.image) data.append('image', profileForm.image);
+
+        setModal(null);
+        setError('');
+      } catch (err: any) {
+        setError('Failed to update profile.');
+      }
+    }}
+  >
+    <Dialog.Title className="text-2xl font-bold mb-6 text-cyan-700">Edit Profile</Dialog.Title>
+    <div className="flex flex-col gap-3">
+      {[
+        { label: "Username", value: profileForm.username, key: "username" },
+        { label: "First Name", value: profileForm.firstName, key: "firstName" },
+        { label: "Last Name", value: profileForm.lastName, key: "lastName" },
+        { label: "School", value: profileForm.school, key: "school" },
+        { label: "Course", value: profileForm.course, key: "course" },
+        { label: "Likes", value: profileForm.likes, key: "likes" },
+        { label: "Bio", value: profileForm.bio, key: "bio" },
+      ].map(({ label, value, key }) => (
+        <div className="flex items-center gap-4" key={key}>
+          <label className="w-32 font-semibold text-cyan-700">{label}</label>
+          <input
+            type="text"
+            className="border border-gray-200 rounded-lg px-3 py-2 flex-1 bg-gray-50 text-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-200 transition"
+            value={value}
+            onChange={e => setProfileForm(prev => ({ ...prev, [key]: e.target.value }))}
+          />
+        </div>
+      ))}
     </div>
+    <div className="flex gap-2 mt-8 justify-end">
+      <button type="submit" className="bg-cyan-700 hover:bg-cyan-800 text-white px-6 py-2 rounded-lg font-semibold shadow transition">Save</button>
+      <button type="button" className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg font-semibold transition" onClick={() => setModal(null)}>Cancel</button>
+    </div>
+    {error && <p className="text-red-500 mt-2">{error}</p>}
   </form>
+</div>
           
   <a
    href="#"
@@ -208,11 +276,101 @@ const Profile = () => {
       </div>
 
     <Dialog open={modal !== null} onClose={() => setModal(null)} className="fixed z-50 inset-0 flex items-center justify-center">
-        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
-        <div className="relative bg-white rounded-xl shadow-xl p-8 w-full max-w-md mx-auto z-10">
-          {renderModalContent()}
+  <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+  <div className="relative z-10 flex items-center justify-center w-full min-h-screen">
+    {modal === 'edit' && (
+      <div
+        className="bg-white rounded-3xl shadow-xl p-10 flex flex-row gap-10 items-start"
+        style={{ minWidth: 900, maxWidth: 1100 }}
+      >
+        {/* Left: Profile Image & File Input */}
+        <div className="flex flex-col w-1/3 min-w-[250px] h-[500px] justify-center items-center">
+          <div className="flex flex-col items-center w-full">
+            <div className="w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center border-4 border-yellow-200 mb-4 shadow">
+              <FaRegUser className="text-gray-400" size={72} />
+            </div>
+            <label className="flex flex-col items-center cursor-pointer w-full group">
+              <span className="text-base mb-2 text-center font-semibold text-cyan-700 group-hover:underline transition">
+                {profileForm.image ? profileForm.image.name : "Choose File"}
+              </span>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={e =>
+                  setProfileForm(prev => ({
+                    ...prev,
+                    image: e.target.files ? e.target.files[0] : null,
+                  }))
+                }
+              />
+            </label>
+            <span className="text-xs text-gray-400 mb-2 text-center">
+              Add or change your profile photo
+            </span>
+          </div>
         </div>
-      </Dialog>
+
+        {/* Divider */}
+        <div className="w-px bg-gray-200 self-stretch mx-2" />
+
+        {/* Right: Edit Form */}
+        <form
+          className="flex flex-col gap-4 w-2/3"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            try {
+              const data = new FormData();
+              data.append('username', profileForm.username);
+              data.append('first_name', profileForm.firstName);
+              data.append('last_name', profileForm.lastName);
+              data.append('school', profileForm.school);
+              data.append('course', profileForm.course);
+              data.append('likes', profileForm.likes);
+              data.append('bio', profileForm.bio || '');
+              if (profileForm.image) data.append('image', profileForm.image);
+
+              setModal(null);
+              setError('');
+            } catch (err: any) {
+              setError('Failed to update profile.');
+            }
+          }}
+        >
+          <Dialog.Title className="text-2xl font-bold mb-6 text-cyan-700">Edit Profile</Dialog.Title>
+          <div className="flex flex-col gap-3">
+            {[
+              { label: "Username", value: profileForm.username, key: "username" },
+              { label: "First Name", value: profileForm.firstName, key: "firstName" },
+              { label: "Last Name", value: profileForm.lastName, key: "lastName" },
+              { label: "School", value: profileForm.school, key: "school" },
+              { label: "Course", value: profileForm.course, key: "course" },
+              { label: "Likes", value: profileForm.likes, key: "likes" },
+              { label: "Bio", value: profileForm.bio, key: "bio" },
+            ].map(({ label, value, key }) => (
+              <div className="flex items-center gap-4" key={key}>
+                <label className="w-32 font-semibold text-cyan-700">{label}</label>
+                <input
+                  type="text"
+                  className="border border-gray-200 rounded-lg px-3 py-2 flex-1 bg-gray-50 text-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-200 transition"
+                  value={value}
+                  onChange={e => setProfileForm(prev => ({ ...prev, [key]: e.target.value }))}
+                />
+              </div>
+            ))}
+          </div>
+          <div className="flex gap-2 mt-8 justify-end">
+            <button type="submit" className="bg-cyan-700 hover:bg-cyan-800 text-white px-6 py-2 rounded-lg font-semibold shadow transition">Save</button>
+            <button type="button" className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg font-semibold transition" onClick={() => setModal(null)}>Cancel</button>
+          </div>
+          {error && <p className="text-red-500 mt-2">{error}</p>}
+        </form>
+      </div>
+    )}
+    {/* Keep other modals (email, password, passkey) as they are */}
+    {modal !== 'edit' && renderModalContent()}
+  </div>
+</Dialog>
     </div>
   )
 }
