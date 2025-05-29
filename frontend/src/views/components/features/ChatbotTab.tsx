@@ -26,6 +26,7 @@ const ChatbotTab: React.FC = () => {
             </div>
         </div>
     )
+    
 }
 
 export default ChatbotTab

@@ -1,6 +1,7 @@
 // context/ChatProvider.tsx
 import React, {createContext, useContext, useState, useEffect, ReactNode} from "react";
-import {api} from "../api/client";
+import chatService from '../services/chatService';
+
 
 interface Message {
   role: "system" | "user" | "assistant";
@@ -18,13 +19,37 @@ const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
 const ChatProvider: React.FC<{children: ReactNode}> = ({children}) => {
 
+  // Initialize messages from localStorage or set default system message
   const [messages, setMessages] = useState<Message[]>(() => {
+
+    // Attempt to retrieve messages from localStorage
     const saved = localStorage.getItem("chat_messages");
-    return saved
-      ? JSON.parse(saved)
-      : [{role: "system", content: "You are a helpful assistant."}];
+
+    // If messages exist, parse them; otherwise, return default system message
+    if (saved) {
+      try {
+        // Parse the saved messages
+        const parsed = JSON.parse(saved);
+        // Cast and filter to ensure correct types
+        return Array.isArray(parsed)
+          ? parsed.filter(
+            // Type guard to ensure each message is of type Message
+              (msg): msg is Message =>
+                // Check if msg has role and content properties
+                typeof msg.content === "string" &&
+                ["user", "system", "assistant"].includes(msg.role)
+            )
+            // If parsing is successful, return the parsed messages
+          : [{ role: "system", content: "You are a helpful assistant." }];
+      } catch {
+        // If parsing fails, fallback to default
+        return [{ role: "system", content: "You are a helpful assistant." }];
+      }
+    }
+    return [{ role: "system", content: "You are a helpful assistant." }];
   });
 
+  // State to manage user input
   const [userInput, setUserInput] = useState("");
 
   // Persist messages in localStorage
@@ -34,19 +59,22 @@ const ChatProvider: React.FC<{children: ReactNode}> = ({children}) => {
 
   const sendMessage = async () => {
     
+    // Prevent sending empty messages
     if (!userInput.trim()) return;
 
-    const updatedMessages = [...messages, {role: "user", content: userInput}];
+    // Update messages with the new user input
+    const updatedMessages = [...messages, {role: "user" as "user", content: userInput}];
+    //
     setMessages(updatedMessages);
     setUserInput("");
 
     try {
-      const res = await api.post("/chat_with_deepseek", {
-        messages: updatedMessages
-      });
+      // Use chatService.chatbot instead of api.post directly
+    const res = await chatService.chatbot(updatedMessages);
 
-      const assistantReply = res.data?.choices?.[0]?.message?.content || "No reply.";
-      setMessages(prev => [...prev, {role: "assistant", content: assistantReply}]);
+    const assistantReply = res?.choices?.[0]?.message?.content || "No reply.";
+    setMessages(prev => [...prev, { role: "assistant", content: assistantReply }]);
+
     } catch (err) {
       console.error("Chat API error:", err);
     }
