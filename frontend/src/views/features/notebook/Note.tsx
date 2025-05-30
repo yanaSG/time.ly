@@ -56,10 +56,10 @@ const Note = () => {
     }
   };
 
-  const handleEditorContentChange = useCallback(async (content: string) => {
+  const handleEditorContentChange = useCallback(async (content: string | null) => {
     console.log('Note: handleEditorContentChange received content:', content);
     console.log('Note: currentNotebook BEFORE update attempt:', currentNotebook);
-    if (currentNotebook) {
+    if (currentNotebook && content) {
       try {
         await updateNotebookContent(currentNotebook.id, content);
         console.log('Note: Notebook content saved successfully.');
@@ -108,6 +108,7 @@ const Note = () => {
           {/* Note Sidebar */}
           <NoteSideBar
             uploadModalClick={() => setUploadModalOpen(!uploadModalOpen)}
+            saveButtonClick={() => handleEditorContentChange(currentContent)}
             noteTitle={currentNotebook?.description ?? ''}
             notebook={currentNotebook?.title ?? ''}
             createdAt={currentNotebook?.created_at ?? ''}

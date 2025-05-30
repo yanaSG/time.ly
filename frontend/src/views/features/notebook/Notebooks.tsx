@@ -4,6 +4,7 @@ import { useAuth } from '../../../hooks/useAuth';
 import { useNotebooks } from '../../../providers/NotebookProvider';
 import FlashNotif from '../../components/ui/FlashNotif';
 import { useNavigate } from 'react-router-dom';
+import { useNotebookContent } from '../../../providers/NotebookContentProvider';
 
 const Notebooks: React.FC = () => {
   const navigate = useNavigate(); // Hook to navigate between routes
@@ -14,6 +15,7 @@ const Notebooks: React.FC = () => {
   const [description, setDescription] = useState('');
   const { user } = useAuth(); // Get the current user from authentication context
   const { notebooks, fetchNotebooks, addNotebook, getNotebookById } = useNotebooks();
+  const { getNotebookContent, currentContent } = useNotebookContent();
   const [flashMessage, setFlashMessage] = useState<string | null>(null);
 
   // Effect to handle body overflow when modal is open
@@ -82,6 +84,8 @@ const Notebooks: React.FC = () => {
       const notebook = await getNotebookById(id);
       console.log('Selected notebook:', notebook);
       if (notebook) {
+        await getNotebookContent(notebook.id);
+        console.log('Notebools: FETCHED CONTENT: ', currentContent);
         console.log('Navigating to note with notebook ID:', notebook.id);
         navigate('/note');
       } else {

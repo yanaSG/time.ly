@@ -18,7 +18,7 @@ interface PageEditorProps {
 }
 
 const PageEditor = ({ notebook, initialContent, appendMarkdown, onContentChange, onAppendDone }: PageEditorProps) => {
-  const { currentContent, getNotebookContent } = useNotebookContent(); // Ensure this is imported correctly
+  const { currentContent } = useNotebookContent();
   // Helper to generate unique IDs for lines
   const generateUniqueId = useCallback(() => {
     return Date.now().toString() + Math.random().toString(36).substring(2, 9);
@@ -69,38 +69,6 @@ const PageEditor = ({ notebook, initialContent, appendMarkdown, onContentChange,
     }
   }, [appendMarkdown, onAppendDone, generateUniqueId]);
 
-  // Derive the full content from the editorLines state for saving
-  const fullContentForSave = editorLines.filter((line, index) =>
-    !(index === editorLines.length - 1 && line.content.trim() === '')
-  ).map(line => line.content).join('\n');
-
-  // Debounce the fullContentForSave before passing it to onContentChange
-  const debouncedContent = useDebounce(fullContentForSave, 1000); // Debounce for 1 second (1000ms)
-
-  // Effect to call onContentChange whenever debouncedContent updates
-  useEffect(() => {
-    // Only save if debouncedContent is different from initialContent.
-    // This prevents saving an empty string if the editor was initially empty and nothing was typed.
-    // It also prevents saving if the content hasn't truly changed from the last loaded state (debouncedContent === initialContent).
-    if (initialContent === null) {
-      getNotebookContent(notebook).catch((err: any) => {
-        console.error('Error fetching notebook content:', err);
-      });
-
-      if (currentContent) {
-        initialContent = currentContent;
-      }
-    }
-
-    if (debouncedContent !== initialContent) {
-      console.log('PageEditor: Debounced content changed. Calling onContentChange with content:', debouncedContent);
-      onContentChange(debouncedContent);
-    } else {
-      console.log('PageEditor: Debounced content is same as initialContent, skipping save.');
-    }
-  }, [debouncedContent, onContentChange, initialContent]);
-
-
   // Auto-resize textareas and focus management
   useEffect(() => {
     const handleTextareaInput = (e: Event) => {
@@ -129,6 +97,22 @@ const PageEditor = ({ notebook, initialContent, appendMarkdown, onContentChange,
       });
     };
   }, [editorLines]);
+
+  const fullContentForSave = editorLines.filter((line, index) =>
+    !(index === editorLines.length - 1 && line.content.trim() === '')
+  ).map(line => line.content).join('\n');
+
+  const debouncedContent = useDebounce(fullContentForSave, 1000); // Debounce for 1 second (1000ms)
+
+  useEffect(() => {
+    console.log('PageEditor: INITIAL CONTENT:', initialContent);
+    if (debouncedContent !== initialContent && currentContent !== null) {
+      console.log('PageEditor: Debounced content changed. Calling onContentChange with content:', debouncedContent);
+      onContentChange(debouncedContent);
+    } else {
+      console.log('PageEditor: Debounced content is same as initialContent, skipping save.');
+    }
+  }, [debouncedContent, onContentChange, initialContent]);
 
   const handleLineChange = (id: string, e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setEditorLines(prev => prev.map(line =>

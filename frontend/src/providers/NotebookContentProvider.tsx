@@ -6,7 +6,7 @@ import { api } from '../api/client';
 
 interface NotebookContentApiResponse {
     notebook: number;
-    markdown_summary: string;
+    markdown_content: string;
     updated_at: string;
 }
 
@@ -39,8 +39,8 @@ export const NotebookContentProvider: React.FC<{ children: React.ReactNode }> = 
 
         try {
             const response = await api.get<NotebookContentApiResponse>(`/notebooks/${notebookId}/content/`);
-            setCurrentContent(response.data.markdown_summary);
-            return response.data.markdown_summary;
+            setCurrentContent(response.data.markdown_content);
+            return response.data.markdown_content;
         } catch (err: any) {
             setError(err.response?.data?.detail || err.message || 'Failed to fetch notebook content.');
             console.error('useNotebookContent: Error fetching notebook content:', err);
@@ -79,16 +79,16 @@ export const NotebookContentProvider: React.FC<{ children: React.ReactNode }> = 
         }
     }, [user]); // Dependency on user for updateNotebookContent
 
-    useEffect(() => {
-        if (user && currentNotebook) {
-            setIsLoading(true);
-            getNotebookContent(currentNotebook.id);
-        } else {
-            setIsLoading(true);
-            setCurrentContent(null);
-        }
-        setIsLoading(false);
-    }, [user, currentNotebook, getNotebookContent]);
+    // useEffect(() => {
+    //     if (user && currentNotebook) {
+    //         setIsLoading(true);
+    //         getNotebookContent(currentNotebook.id);
+    //     } else {
+    //         setIsLoading(true);
+    //         setCurrentContent(null);
+    //     }
+    //     setIsLoading(false);
+    // }, [user, currentNotebook]);
 
     const contextValue = {
         currentContent,

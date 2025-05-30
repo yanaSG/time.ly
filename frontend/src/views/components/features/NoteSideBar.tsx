@@ -40,7 +40,7 @@ const NoteSideBar: React.FC<NoteSideBarProps> = ({ notebook, noteTitle, createdA
                         <p className='text-[#6C7778] text-xs'>May 24, 2025 - 5 days left</p>
                     </div>
 
-                    <div className='flex flex-col gap-2'>
+                    {/* <div className='flex flex-col gap-2'>
                         <div>
                             <p className='text-[#6C7778] text-xs'>Notes reviewed:</p>
                             <div className="w-full bg-[#8BCBC0] rounded-full h-2.5">
@@ -53,7 +53,7 @@ const NoteSideBar: React.FC<NoteSideBarProps> = ({ notebook, noteTitle, createdA
                                 <div className="w-[30%] bg-[#EF988F] h-2.5 rounded-full"></div>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
 
                     <div>
                         <div className='flex gap-2'>
