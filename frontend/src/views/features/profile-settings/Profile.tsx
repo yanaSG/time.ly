@@ -1,21 +1,39 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { FaRegUser } from "react-icons/fa6"
 import { Dialog } from '@headlessui/react'
+import { useAuth } from '../../../hooks/useAuth'
 
 const Profile = () => {
-  const [modal, setModal]=useState<null | 'edit' | 'email' | 'password' | 'passkey'>(null)
-const [profileForm, setProfileForm] = useState({
-  username: 'Johanne',
-  email: 'johanne@email.com',
-  firstName: 'Johanne',
-  lastName: 'Nacorda',
-  school: 'University of San Jose-Recoletos',
-  course: 'BS Computer Science',
-  likes: 'Coding, Music, Reading',
-  bio: 'Passionate learner and note-taker.',
-  image: null as File | null,
-});
+  const { user, updateProfile, refreshUser } = useAuth();
+  const [modal, setModal] = useState<null | 'edit' | 'email' | 'password' | 'passkey'>(null);
+  const [profileForm, setProfileForm] = useState({
+    username: '',
+    email: '',
+    firstName: '',
+    lastName: '',
+    school: '',
+    course: '',
+    likes: '',
+    bio: '',
+    image: null as File | null,
+  });
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (user) {
+      setProfileForm({
+        username: user.username || '',
+        email: user.email || '',
+        firstName: user.fname || '',
+        lastName: user.lname || '',
+        school: user.school || '',
+        course: user.course || '',
+        likes: user.likes || '',
+        bio: user.bio || '',
+        image: null,
+      });
+    }
+  }, [user, modal]);
 
   const renderModalContent = () => {
     switch (modal) {
@@ -32,7 +50,15 @@ const [profileForm, setProfileForm] = useState({
   <div className="flex flex-col w-1/3 min-w-[250px] h-[500px] justify-center items-center">
     <div className="flex flex-col items-center w-full">
       <div className="w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center border-4 border-yellow-200 mb-4 shadow">
-        <FaRegUser className="text-gray-400" size={72} />
+        {user?.image ? (
+          <img
+            src={user.image}
+            alt="Profile"
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <FaRegUser className="text-gray-400" size={72} />
+        )}
       </div>
       <label className="flex flex-col items-center cursor-pointer w-full group">
         <span className="text-base mb-2 text-center font-semibold text-cyan-700 group-hover:underline transition">
@@ -67,17 +93,22 @@ const [profileForm, setProfileForm] = useState({
       try {
         const data = new FormData();
         data.append('username', profileForm.username);
-        data.append('first_name', profileForm.firstName);
-        data.append('last_name', profileForm.lastName);
+        data.append('email', profileForm.email);
+        data.append('fname', profileForm.firstName);
+        data.append('lname', profileForm.lastName);
         data.append('school', profileForm.school);
         data.append('course', profileForm.course);
         data.append('likes', profileForm.likes);
         data.append('bio', profileForm.bio || '');
         if (profileForm.image) data.append('image', profileForm.image);
 
+        await updateProfile(data);
+        await refreshUser();
         setModal(null);
         setError('');
       } catch (err: any) {
+        //  error detaiils for debugging
+        console.log(err.response?.data);
         setError('Failed to update profile.');
       }
     }}
@@ -131,6 +162,7 @@ const [profileForm, setProfileForm] = useState({
             <>
             <Dialog.Title className="text-xl font-bold mb-4">Change Email</Dialog.Title>
             <form className="flex flex-col gap-4">
+              
               <input
                 type="email"
                 placeholder="New Email"
@@ -215,22 +247,29 @@ const [profileForm, setProfileForm] = useState({
       <div className="flex-1 bg-white/80 rounded-3xl shadow-xl p-6 md:p-10 flex flex-col items-center md:items-start max-w-full">
         <div className="flex flex-col md:flex-row md:items-center w-full mb-6">
           <div className="flex justify-center md:justify-start">
-            <div className="w-24 h-24 flex items-center justify-center rounded-full border-4 border-yellow-200 bg-gray-100 mb-4 md:mb-0 md:mr-6">
-              <FaRegUser className="text-gray-400" size={64} />
+            <div className="w-24 h-24 flex items-center justify-center rounded-full border-4 border-yellow-200 bg-gray-100 mb-4 md:mb-0 md:mr-6 overflow-hidden">
+              {user?.image ? (
+                <img
+                  src={user.image}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <FaRegUser className="text-gray-400" size={64} />
+              )}
             </div>
           </div>
           <div className="flex flex-col items-center md:items-start w-full">
-            <h2 className="text-2xl md:text-3xl font-bold text-cyan-700 mb-1">Johanne</h2>
-            <p className="text-gray-500 mb-2 md:mb-0">johanne@email.com</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-cyan-700 mb-1">
+              {user?.fname || ''} {user?.lname || ''}
+            </h2>
+            <p className="text-gray-500 mb-2 md:mb-0">{user?.email || ''}</p>
           </div>
         </div>
 
-    
         <div className="w-full bg-yellow-50 rounded-xl p-4 mb-6 text-gray-700">
-          <span className="font-semibold">Bio:</span> Passionate learner and note-taker.
+          <span className="font-semibold">Bio:</span> {user?.bio || ''}
         </div>
-
-  
         <button className="w-full md:w-auto bg-yellow-200 hover:bg-yellow-300 text-gray-800 font-semibold py-2 px-6 rounded-lg shadow transition mb-8"
           onClick={()=> setModal('edit')}
           >           
@@ -249,7 +288,7 @@ const [profileForm, setProfileForm] = useState({
             </div>
 
 
-            <p className="text-gray-500 text-sm ml-1">johanne@email.com</p>
+            <p className="text-gray-500 text-sm ml-1">{user?.email || ''}</p>
           </div>
           <div className="mb-6">
             <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-1">
@@ -322,17 +361,22 @@ const [profileForm, setProfileForm] = useState({
             try {
               const data = new FormData();
               data.append('username', profileForm.username);
-              data.append('first_name', profileForm.firstName);
-              data.append('last_name', profileForm.lastName);
+              data.append('email', profileForm.email); // <-- Add this line
+              data.append('fname', profileForm.firstName);
+              data.append('lname', profileForm.lastName);
               data.append('school', profileForm.school);
               data.append('course', profileForm.course);
               data.append('likes', profileForm.likes);
               data.append('bio', profileForm.bio || '');
               if (profileForm.image) data.append('image', profileForm.image);
 
+              await updateProfile(data);
+              await refreshUser();
               setModal(null);
               setError('');
             } catch (err: any) {
+              // Log backend error details for debugging
+              console.log(err.response?.data);
               setError('Failed to update profile.');
             }
           }}
