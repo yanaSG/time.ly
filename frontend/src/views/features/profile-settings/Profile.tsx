@@ -161,18 +161,40 @@ const Profile = () => {
           return (
             <>
             <Dialog.Title className="text-xl font-bold mb-4">Change Email</Dialog.Title>
-            <form className="flex flex-col gap-4">
-              
-              <input
-                type="email"
-                placeholder="New Email"
-                className="border rounded px-3 py-2"
-              />
-              <div className="flex gap-2 mt-4">
-                <button type="submit" className="bg-cyan-700 text-white px-4 py-2 rounded">Save</button>
-                <button type="button" className="bg-gray-200 px-4 py-2 rounded" onClick={() => setModal(null)}>Cancel</button>
-              </div>
-            </form>
+            <form
+  className="flex flex-col gap-4"
+  onSubmit={async (e) => {
+    e.preventDefault();
+    try {
+      const data = new FormData();
+      data.append('username', user?.username || '');
+      data.append('email', profileForm.email); 
+
+      await updateProfile(data); 
+      await refreshUser();
+      setModal(null);
+      setError('');
+    } catch (err: any) {
+      console.log(err.response?.data);
+      setError('Failed to update email.');
+    }
+  }}
+>
+  <label className="font-bold mb-2">New Email</label>
+  <input
+    type="email"
+    placeholder="New Email"
+    className="border rounded px-3 py-2"
+    value={profileForm.email}
+    onChange={e => setProfileForm(prev => ({ ...prev, email: e.target.value }))}
+    required
+  />
+  <div className="flex gap-2 mt-4">
+    <button type="submit" className="bg-cyan-700 text-white px-4 py-2 rounded">Save</button>
+    <button type="button" className="bg-gray-200 px-4 py-2 rounded" onClick={() => setModal(null)}>Cancel</button>
+  </div>
+  {error && <p className="text-red-500 mt-2">{error}</p>}
+</form>
 
               <a
                 href="#"
