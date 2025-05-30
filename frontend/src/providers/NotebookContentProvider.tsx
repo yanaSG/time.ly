@@ -11,6 +11,7 @@ interface NotebookContentApiResponse {
 }
 
 interface NotebookContentContextType {
+    contentUpdatedAt: string | null;
     currentContent: string | null;
     isLoading: boolean;
     error: string | null;
@@ -25,6 +26,7 @@ export const NotebookContentProvider: React.FC<{ children: React.ReactNode }> = 
     const { currentNotebook } = useNotebooks();
 
     const [currentContent, setCurrentContent] = useState<string | null>(null);
+    const [contentUpdatedAt, setContentUpdatedAt] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -40,6 +42,7 @@ export const NotebookContentProvider: React.FC<{ children: React.ReactNode }> = 
         try {
             const response = await api.get<NotebookContentApiResponse>(`/notebooks/${notebookId}/content/`);
             setCurrentContent(response.data.markdown_content);
+            setContentUpdatedAt(response.data.updated_at);
             return response.data.markdown_content;
         } catch (err: any) {
             setError(err.response?.data?.detail || err.message || 'Failed to fetch notebook content.');
@@ -92,6 +95,7 @@ export const NotebookContentProvider: React.FC<{ children: React.ReactNode }> = 
 
     const contextValue = {
         currentContent,
+        contentUpdatedAt,
         isLoading,
         error,
         getNotebookContent,

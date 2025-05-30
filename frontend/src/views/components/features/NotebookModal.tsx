@@ -7,7 +7,7 @@ interface NotebookModalProps {
   // For adding a new notebook
   onAddNotebook?: (newNotebook: Omit<Notebook, "id" | "created_at" | "updated_at"> & { color: string; mastery_goal: string | null }) => Promise<void>;
   // For updating an existing notebook
-  onUpdateNotebook?: (notebookId: number, updatedFields: Partial<Notebook> & { color?: string; mastery_goal?: string | null }) => Promise<void>;
+  onUpdateNotebook?: (notebookId: number, updatedFields: Omit<Notebook, "id" | "created_at" | "updated_at"> & { color?: string; mastery_goal?: string | null }) => Promise<void>;
   initialNotebook?: Notebook | null; // Optional prop to pre-fill form for editing
   user: any; // You might want to refine this type based on your actual user object
 }
@@ -61,7 +61,8 @@ const NotebookModal: React.FC<NotebookModalProps> = ({ isOpen, onClose, onAddNot
     if (initialNotebook) {
       // Update existing notebook
       if (onUpdateNotebook) {
-        const updatedFields: Partial<Notebook> & { color?: string; mastery_goal?: string | null } = {
+        const updatedFields: Omit<Notebook, "id" | "created_at" | "updated_at"> & { color?: string; mastery_goal?: string } = {
+          user_id: user.id,
           title: title.trim(),
           description: description.trim(),
           color: color,

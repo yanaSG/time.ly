@@ -1,5 +1,6 @@
 import React from 'react'
 import { IoArrowUndoOutline } from "react-icons/io5";
+import { MdDeleteOutline } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
 import UploadButton from '../../components/ui/buttons/UploadButton'
 import { useNavigate } from 'react-router-dom';
@@ -9,13 +10,15 @@ interface NoteSideBarProps {
     notebook: string;
     noteTitle: string;
     createdAt: string;
-    updatedAt: string;
+    updatedAt: Date | string;
+    masteryGoal: string;
     uploadModalClick: () => void;
     saveButtonClick?: () => void;
     editModalClick?: () => void;
+    deleteModalClick?: () => void;
 }
 
-const NoteSideBar: React.FC<NoteSideBarProps> = ({ notebook, noteTitle, createdAt, updatedAt, uploadModalClick, saveButtonClick, editModalClick }) => {
+const NoteSideBar: React.FC<NoteSideBarProps> = ({ notebook, noteTitle, masteryGoal, createdAt, updatedAt, uploadModalClick, saveButtonClick, editModalClick, deleteModalClick }) => {
     const navigate = useNavigate();
 
     const handleBackClick = () => {
@@ -26,7 +29,10 @@ const NoteSideBar: React.FC<NoteSideBarProps> = ({ notebook, noteTitle, createdA
         <div className='w-65 h-full p-3 flex flex-col justify-between bg-white/90 rounded-xl shadow-lg'>
             <div className='flex justify-between items-center'>
                 <IoArrowUndoOutline className='text-[#414A4B] size-8 cursor-pointer' onClick={handleBackClick} />
-                <FaRegEdit className='text-[#414A4B] size-5 cursor-pointer' onClick={editModalClick} />
+                <div className='flex gap-2 items-center'>
+                    <FaRegEdit className='text-[#414A4B] size-5 cursor-pointer' onClick={editModalClick} />
+                    <MdDeleteOutline className='text-red-700 size-6 cursor-pointer' onClick={deleteModalClick} />
+                </div>
             </div>
 
             <div className='flex flex-col gap-3'>
@@ -38,7 +44,23 @@ const NoteSideBar: React.FC<NoteSideBarProps> = ({ notebook, noteTitle, createdA
                 <div className='flex flex-col gap-5'>
                     <div className='flex flex-col gap-2'>
                         <h6 className='text-[#6C7778] text-xs font-bold'>Mastery Goal</h6>
-                        <p className='text-[#6C7778] text-xs'>May 24, 2025 - 5 days left</p>
+                        <p className='text-[#6C7778] text-xs'>
+                            {(() => {
+                                if (!masteryGoal) return '';
+                                const goalDate = new Date(masteryGoal);
+                                const now = new Date();
+                                const diffTime = goalDate.getTime() - now.getTime();
+                                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                                const formattedDate = goalDate.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+                                if (diffDays > 0) {
+                                    return `${formattedDate} - ${diffDays} day${diffDays !== 1 ? 's' : ''} left`;
+                                } else if (diffDays === 0) {
+                                    return `${formattedDate} - today`;
+                                } else {
+                                    return `${formattedDate} - ${Math.abs(diffDays)} day${Math.abs(diffDays) !== 1 ? 's' : ''} overdue`;
+                                }
+                            })()}
+                        </p>
                     </div>
 
                     {/* <div className='flex flex-col gap-2'>

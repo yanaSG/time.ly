@@ -20,7 +20,7 @@ const addNotebook = async (notebook: Omit<Notebook, "id" | "created_at" | "updat
   return response.data;
 };
 
-const updateNotebook = async (id: number, notebook: Partial<Notebook>, config?: AxiosRequestConfig): Promise<any> => {
+const updateNotebook = async (id: number, notebook: Omit<Notebook, "id" | "created_at" | "updated_at">, config?: AxiosRequestConfig): Promise<any> => {
   const response = await api.put<any>(`notebooks/${id}/`, notebook, config);
   return response.data;
 };

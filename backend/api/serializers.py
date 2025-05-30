@@ -70,7 +70,7 @@ class ObtainTokenSerializer(TokenObtainPairSerializer):
 class NotebookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notebook
-        fields = ['id', 'title', 'description', 'color', 'mastery_goal' 'created_at', 'updated_at']
+        fields = ['id', 'title', 'description', 'color', 'mastery_goal', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
 
     def create(self, validated_data):
