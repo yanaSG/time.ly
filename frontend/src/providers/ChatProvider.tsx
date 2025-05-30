@@ -11,6 +11,7 @@ interface Message {
 interface ChatContextType {
   messages: Message[];
   userInput: string;
+  clearMessages: () => void;
   setUserInput: (input: string) => void;
   sendMessage: () => Promise<void>;
 }
@@ -18,6 +19,10 @@ interface ChatContextType {
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
 const ChatProvider: React.FC<{children: ReactNode}> = ({children}) => {
+  const clearMessages = () => {
+    setMessages([{ role: "system", content: "You are a helpful assistant." }]);
+    localStorage.removeItem("chat_messages");
+  };
 
   // Initialize messages from localStorage or set default system message
   const [messages, setMessages] = useState<Message[]>(() => {
@@ -100,6 +105,7 @@ const ChatProvider: React.FC<{children: ReactNode}> = ({children}) => {
   return (
     <ChatContext.Provider
       value={{
+        clearMessages,
         messages,
         userInput,
         setUserInput,

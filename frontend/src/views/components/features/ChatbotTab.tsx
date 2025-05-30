@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect }from 'react'
 import { GrSend } from "react-icons/gr";
 
 import { useChat } from '../../../hooks/useChat';
@@ -7,19 +7,23 @@ import NootBubble from '../ui/chat-bubbles/NootBubble';
 
 const ChatbotTab: React.FC = () => {
 
-    const { userInput, setUserInput, sendMessage, messages } = useChat();
+    const { userInput, setUserInput, sendMessage, messages, clearMessages } = useChat();
     const noot = 'noot.svg'
 
-    // Handler for sending a message
-    // const handleSendMessage = () => {
-    //     if (userInput.trim() === '') return; // Don't send empty messages
-    //     sendMessage();
-    //     setUserInput('');
-    // };
+   useEffect(() => {
+        const handleBeforeUnload = () => {
+            clearMessages();
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [clearMessages]);
 
     
 
     return (
+
         <div className='w-full h-full flex flex-col gap-2 items-start'>
             <div>hello</div>
             <img src={noot} alt="noot" className='h-7 m-1 mx-2' />
