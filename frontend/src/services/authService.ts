@@ -1,7 +1,7 @@
-import { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { AxiosRequestConfig } from 'axios';
 import { api } from '../api/client';
 
-const API_URL = 'http://127.0.0.1:8000/api/';
+// const API_URL = 'http://127.0.0.1:8000/api/';
 
 interface LoginResponse {
   user : {

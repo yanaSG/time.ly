@@ -12,6 +12,7 @@ import { useNotebookContent } from '../../../providers/NotebookContentProvider';
 import NotebookModal from '../../components/features/NotebookModal';
 import { Notebook } from '../../../types/Notebook';
 
+
 const Note = () => {
   const navigate = useNavigate();
   const { currentNotebook, updateNotebook, fetchNotebooks } = useNotebooks();

@@ -2,6 +2,9 @@ import React, { createContext, useState, ReactNode, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
 
+// Define the shape of the context value
+// This includes user information, authentication status, and methods for login, logout, register, and updateProfile
+// The updateProfile function expects a FormData object
 interface AuthContextType {
   user: { id: number; username: string } | null;
   isAuthenticated: boolean;
@@ -31,6 +34,8 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  // Initialize state for user and token
+  // Use localStorage to persist the token across sessions
   const [user, setUser] = useState<{id: number, username: string} | null>(null);
   const [token, setToken] = useState(localStorage.getItem('access_token') || '');
   const navigate = useNavigate();
