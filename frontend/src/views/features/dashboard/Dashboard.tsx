@@ -39,12 +39,14 @@ const Dashboard: React.FC = () => {
                 <p>Course: </p>
                 <p>School:</p>
                 <p>Likes: </p>
+                <p>Bio: </p>
               </div>
               <div className="pl-2">
                 <p>{user ? `${user.fname || ''} ${user.lname || ''}` : ''}</p>
                 <p>{user?.course || ''}</p>
                 <p>{user?.school || ''}</p>
                 <p>{user?.likes || ''}</p>
+                <p>{user?.bio || ''}</p>
               </div>
             
             </div>
