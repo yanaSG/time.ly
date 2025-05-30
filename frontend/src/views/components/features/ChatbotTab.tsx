@@ -74,7 +74,7 @@ import NootBubble from '../ui/chat-bubbles/NootBubble';
 
 const ChatbotTab: React.FC = () => {
 
-    const { userInput, setUserInput, sendMessage, messages } = useChat();
+   // const { userInput, setUserInput, sendMessage, messages } = useChat();
     const noot = 'noot.svg'
 
     return (
@@ -82,10 +82,7 @@ const ChatbotTab: React.FC = () => {
             <img src={noot} alt="noot" className='h-7 m-1 mx-2' />
             <div className='w-full h-full flex flex-col gap-3 bg-white/70 rounded-lg shadow-black/10 shadow-[0_-1px_10px_0_rgba(0,0,0,0.2)]'>
                 <div className='w-full h-full p-2'>
-                     {/* Show the welcome bubble only if there are no assistant messages yet */}
-                    {messages.filter(msg => msg.role === "assistant").length === 0 ? (
-                        <NootBubble message='Hey there! I am Noot—your pocket-sized study buddy! Ready to turn that textbook into bite-sized gems? Upload a PDF or ask me anything!' />
-                    ) : null}
+                    <NootBubble message='Hey there! I am Noot—your pocket-sized study buddy! Ready to turn that textbook into bite-sized gems? Upload a PDF or ask me anything!' />
 
 
                     {/* <NootBubble message='Hey there! I am Noot—your pocket-sized study buddy! Ready to turn that textbook into bite-sized gems? Upload a PDF or ask me anything!' /> */}
