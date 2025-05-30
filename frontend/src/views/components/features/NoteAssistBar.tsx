@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { use, useState } from 'react'
 import { FaArrowRightFromBracket, FaArrowRightToBracket } from 'react-icons/fa6';
 import { MdUpload } from "react-icons/md";
 import { SiChatbot } from "react-icons/si";
@@ -7,7 +7,11 @@ import UploadTab from './UploadTab';
 import ChatbotTab from './ChatbotTab';
 import SuggestionTab from './SuggestionTab';
 
-const NoteAssistBar: React.FC = () => {
+interface NoteAssistBarProps {
+  books: { id: number; title: string; }[];
+}
+
+const NoteAssistBar: React.FC<NoteAssistBarProps> = ({ books }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [uploadTab, setUploadTab] = useState(false);
   const [chatTab, setChatTab] = useState(false);
@@ -37,23 +41,23 @@ const NoteAssistBar: React.FC = () => {
     }
   }
 
-  const openUploadTab = () => {
-    setUploadTab(true);
-    setChatTab(false);
-    setSuggestionTab(false);
-  }
+  // const openUploadTab = () => {
+  //   setUploadTab(true);
+  //   setChatTab(false);
+  //   setSuggestionTab(false);
+  // }
 
-  const openChatTab = () => {
-    setChatTab(true);
-    setUploadTab(false);
-    setSuggestionTab(false);
-  }
+  // const openChatTab = () => {
+  //   setChatTab(true);
+  //   setUploadTab(false);
+  //   setSuggestionTab(false);
+  // }
 
-  const openSuggestionTab = () => {
-    setSuggestionTab(true);
-    setUploadTab(false);
-    setChatTab(false);
-  }
+  // const openSuggestionTab = () => {
+  //   setSuggestionTab(true);
+  //   setUploadTab(false);
+  //   setChatTab(false);
+  // }
 
   return (
     <div className={`w-15 h-full flex flex-col justify-start gap-1 bg-white/40 rounded-xl shadow-lg ${isOpen ? 'w-75' : ''} transform transition-all duration-200`}>
@@ -86,7 +90,7 @@ const NoteAssistBar: React.FC = () => {
         </div>
       </div>
       <div className='h-full'>
-        {uploadTab && <UploadTab />}
+        {uploadTab && <UploadTab books={books} />}
         {chatTab && <ChatbotTab />}
         {suggestionTab && <SuggestionTab />}
       </div>

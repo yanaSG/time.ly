@@ -6,6 +6,7 @@ import FlashNotif from '../../components/ui/FlashNotif';
 import { useNavigate } from 'react-router-dom';
 import { useNotebookContent } from '../../../providers/NotebookContentProvider';
 import NotebookModal from '../../components/features/NotebookModal'; // Import the new modal component
+import { useBooks } from '../../../providers/BookProvider';
 
 const Notebooks: React.FC = () => {
   const navigate = useNavigate(); // Hook to navigate between routes
@@ -16,6 +17,7 @@ const Notebooks: React.FC = () => {
   const { notebooks, fetchNotebooks, addNotebook, getNotebookById } = useNotebooks();
   const { getNotebookContent, currentContent } = useNotebookContent();
   const [flashMessage, setFlashMessage] = useState<string | null>(null);
+  const { titles, getBookTitles } = useBooks();
 
   // Effect to handle body overflow when modal is open
   // This prevents scrolling of the background content when the modal is open
@@ -51,6 +53,8 @@ const Notebooks: React.FC = () => {
       console.log('Selected notebook:', notebook);
       if (notebook) {
         await getNotebookContent(notebook.id);
+        await getBookTitles(notebook.id);
+        console.log('Notebooks: FETCHED TITLES: ', titles);
         console.log('Notebools: FETCHED CONTENT: ', currentContent);
         console.log('Navigating to note with notebook ID:', notebook.id);
         navigate('/note');

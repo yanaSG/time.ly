@@ -6,6 +6,7 @@ import { useNotebooks } from './NotebookProvider';
 
 interface BookContextType {
     books: Book[];
+    titles: {id: number, title: string}[];
     currentBook: Book | null;
     isLoading: boolean;
     error: string | null;
@@ -13,7 +14,7 @@ interface BookContextType {
     getBookById: (notebook_id: number, id: number) => Promise<void>;
     uploadBook: (notebook_id: number, book: FormData) => Promise<string | undefined>;
     deleteBook: (notebook_id: number, id: number) => Promise<void>;
-    getBookTitles: (notebookId: number, id: number) => Promise<{id: number, title: string}[]>;
+    getBookTitles: (notebookId: number) => Promise<{id: number, title: string}[]>;
     getSummary: (notebookId: number, id: number) => Promise<string>;
 }
 
@@ -22,6 +23,7 @@ const BookContext = createContext<BookContextType | undefined>(undefined);
 export const BookProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [books, setBooks] = useState<Book[]>([]);
     const [currentBook, setCurrentBook] = useState<Book | null>(null);
+    const [titles, setTitles] = useState<{ id: number; title: string; }[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { user } = useAuth();
@@ -81,7 +83,9 @@ export const BookProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsLoading(true);
         try {
             const response = await bookService.getBookTitles(notebookId);
-            return response.titles;
+            console.log('Fetched book titles:', response);
+            setTitles(response);
+            return response;
         } catch (err) {
             setError('Failed to fetch book titles');
             return [];
@@ -106,12 +110,14 @@ export const BookProvider: React.FC<{ children: React.ReactNode }> = ({ children
     useEffect(() => {
         if (user && currentNotebook) {
             fetchBooks();
+            getBookTitles(currentNotebook.id);
         }
     }, [user, currentNotebook]);
 
     return (
         <BookContext.Provider value={{
             books,
+            titles,
             currentBook,
             isLoading,
             error,

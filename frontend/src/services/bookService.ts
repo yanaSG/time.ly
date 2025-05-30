@@ -12,10 +12,6 @@ export interface DeleteResponse {
   message: string;
 }
 
-export interface titleListResponse {
-  titles: { id: number, title: string }[];
-}
-
 export interface summaryResponse {
   markdown: string;
 }
@@ -40,8 +36,8 @@ const deleteBook = async (notebook_id: number, id: number, config?: AxiosRequest
   return response.data;
 };
 
-const getBookTitles = async (id: number, config?: AxiosRequestConfig): Promise<titleListResponse> => {
-  const response = await api.post<titleListResponse>(`notebooks/${id}/books/titles/`, config);
+const getBookTitles = async (id: number, config?: AxiosRequestConfig): Promise<any> => {
+  const response = await api.get<any>(`notebooks/${id}/books/titles/`, config);
   return response.data;
 };
 

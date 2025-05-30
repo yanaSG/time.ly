@@ -16,7 +16,7 @@ import ConfirmModal from '../../components/ui/ConfirmModal';
 const Note = () => {
   const navigate = useNavigate();
   const { currentNotebook, updateNotebook, fetchNotebooks, deleteNotebook } = useNotebooks();
-  const { isLoading: isBookLoading, uploadBook } = useBooks();
+  const { titles, isLoading: isBookLoading, uploadBook } = useBooks();
   const { user } = useAuth();
   const { currentContent, contentUpdatedAt, isLoading: isContentLoading, updateNotebookContent } = useNotebookContent();
 
@@ -181,7 +181,7 @@ const Note = () => {
           </div>
 
           {/* Note Assist Bar */}
-          <NoteAssistBar />
+          <NoteAssistBar books={titles} />
         </div>
       ) : (
         null
