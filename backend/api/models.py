@@ -28,6 +28,8 @@ class Notebook(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='notebooks')
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True)
+    color = models.CharField(max_length=20, default='#FFD25E')
+    mastery_goal = models.DateTimeField(null=True, blank=True, default=None)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

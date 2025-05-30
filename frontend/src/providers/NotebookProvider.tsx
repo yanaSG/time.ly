@@ -11,7 +11,7 @@ interface NotebookContextType {
     fetchNotebooks: () => Promise<void>;
     getNotebookById: (id: number) => Promise<Notebook | undefined>;
     addNotebook: (notebook: Omit<Notebook, "id" | "created_at" | "updated_at">) => Promise<any>;
-    updateNotebook: (id: number, notebook: Notebook) => Promise<any>;
+    updateNotebook: (id: number, notebook: Partial<Notebook>) => Promise<any>;
     deleteNotebook: (id: number) => Promise<any>;
 }
 
@@ -79,7 +79,7 @@ export const NotebookProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
     };
 
-    const updateNotebook = async (id: number, notebook: Notebook) => {
+    const updateNotebook = async (id: number, notebook: Partial<Notebook>) => {
         setIsLoading(true);
         try {
             const response = await notebookService.updateNotebook(id, notebook);

@@ -5,7 +5,7 @@ import { Notebook } from '../types/Notebook';
 const getAll = async (user_id: number, config?: AxiosRequestConfig): Promise<Notebook[]> => {
   const response = await api.get<Notebook[]>(`notebooks/`, {
     ...config,
-    params: { user_id } // Send user_id as a query parameter
+    params: { user_id }
   });
   return response.data;
 };
@@ -20,7 +20,7 @@ const addNotebook = async (notebook: Omit<Notebook, "id" | "created_at" | "updat
   return response.data;
 };
 
-const updateNotebook = async (id: number, notebook: Notebook, config?: AxiosRequestConfig): Promise<any> => {
+const updateNotebook = async (id: number, notebook: Partial<Notebook>, config?: AxiosRequestConfig): Promise<any> => {
   const response = await api.put<any>(`notebooks/${id}/`, notebook, config);
   return response.data;
 };

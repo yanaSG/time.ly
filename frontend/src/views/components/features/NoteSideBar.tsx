@@ -12,9 +12,10 @@ interface NoteSideBarProps {
     updatedAt: string;
     uploadModalClick: () => void;
     saveButtonClick?: () => void;
+    editModalClick?: () => void;
 }
 
-const NoteSideBar: React.FC<NoteSideBarProps> = ({ notebook, noteTitle, createdAt, updatedAt, uploadModalClick, saveButtonClick }) => {
+const NoteSideBar: React.FC<NoteSideBarProps> = ({ notebook, noteTitle, createdAt, updatedAt, uploadModalClick, saveButtonClick, editModalClick }) => {
     const navigate = useNavigate();
 
     const handleBackClick = () => {
@@ -25,7 +26,7 @@ const NoteSideBar: React.FC<NoteSideBarProps> = ({ notebook, noteTitle, createdA
         <div className='w-65 h-full p-3 flex flex-col justify-between bg-white/90 rounded-xl shadow-lg'>
             <div className='flex justify-between items-center'>
                 <IoArrowUndoOutline className='text-[#414A4B] size-8 cursor-pointer' onClick={handleBackClick} />
-                <FaRegEdit className='text-[#414A4B] size-5 cursor-pointer' />
+                <FaRegEdit className='text-[#414A4B] size-5 cursor-pointer' onClick={editModalClick} />
             </div>
 
             <div className='flex flex-col gap-3'>

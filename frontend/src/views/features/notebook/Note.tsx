@@ -9,10 +9,12 @@ import FlashNotif from '../../components/ui/FlashNotif';
 import { useBooks } from '../../../providers/BookProvider';
 import { useAuth } from '../../../hooks/useAuth';
 import { useNotebookContent } from '../../../providers/NotebookContentProvider';
+import NotebookModal from '../../components/features/NotebookModal';
+import { Notebook } from '../../../types/Notebook';
 
 const Note = () => {
   const navigate = useNavigate();
-  const { currentNotebook } = useNotebooks();
+  const { currentNotebook, updateNotebook, fetchNotebooks } = useNotebooks();
   const { isLoading: isBookLoading, uploadBook } = useBooks();
   const { user } = useAuth();
   const { currentContent, isLoading: isContentLoading, updateNotebookContent } = useNotebookContent();
@@ -20,6 +22,7 @@ const Note = () => {
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [flashMessage, setFlashMessage] = useState<string | null>(null);
   const [markdownToAppend, setMarkdownToAppend] = useState<string | null>(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
 
   useEffect(() => {
     console.log('Note: Current notebook (on mount/change):', currentNotebook);
@@ -75,6 +78,18 @@ const Note = () => {
     setMarkdownToAppend(null);
   }, []);
 
+  const handleUpdateNotebook = useCallback(async (notebookId: number, updatedFields: Partial<Notebook> & { color?: string; mastery_goal?: string | null }) => {
+    try {
+      await updateNotebook(notebookId, updatedFields);
+      await fetchNotebooks(); // Re-fetch notebooks to update the list and currentNotebook in context
+      setFlashMessage('Notebook updated successfully!');
+      setEditModalOpen(false); // Close the modal on success
+    } catch (error) {
+      console.error('Note: Error updating notebook:', error);
+      setFlashMessage(`Error updating notebook: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }, [updateNotebook, fetchNotebooks]);
+
   const overallLoading = isBookLoading || isContentLoading;
 
   // Debugging: Log currentContent just before rendering PageEditor
@@ -85,6 +100,17 @@ const Note = () => {
       {/* Upload Modal */}
       {uploadModalOpen && (
         <UploadModal isOpen={uploadModalOpen} onClose={() => setUploadModalOpen(false)} onUpload={onUpload} />
+      )}
+
+      {/* Edit Notebook Modal */}
+      {editModalOpen && currentNotebook && (
+        <NotebookModal
+          isOpen={editModalOpen}
+          onClose={() => setEditModalOpen(false)}
+          onUpdateNotebook={handleUpdateNotebook}
+          initialNotebook={currentNotebook} // Pass the current notebook for editing
+          user={user}
+        />
       )}
 
       {/* Flash Notification */}
@@ -109,6 +135,7 @@ const Note = () => {
           <NoteSideBar
             uploadModalClick={() => setUploadModalOpen(!uploadModalOpen)}
             saveButtonClick={() => handleEditorContentChange(currentContent)}
+            editModalClick={() => setEditModalOpen(!editModalOpen)}
             noteTitle={currentNotebook?.description ?? ''}
             notebook={currentNotebook?.title ?? ''}
             createdAt={currentNotebook?.created_at ?? ''}
