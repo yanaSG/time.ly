@@ -112,5 +112,5 @@ const ChatProvider: React.FC<{children: ReactNode}> = ({children}) => {
 };
 
 export { ChatProvider, ChatContext };
-export type { Message };
+
 

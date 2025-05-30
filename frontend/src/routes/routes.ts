@@ -42,6 +42,15 @@ export const ROUTES: AppRoute[] = [
     }
   },
   {
+    path: "/dev",
+    element: React.createElement(loadComponent("Dev")),
+    //layout: "MainLayout",
+    meta: {
+      // requiresAuth: true,
+      title: "Dev"
+    }
+  },
+  {
     path: "/register",
     element: React.createElement(loadComponent("Register")),
     layout: "AuthLayout",

@@ -3,6 +3,7 @@ import AppRouter from "./routes/AppRouter";
 import { AuthProvider } from "./providers/AuthProvider";
 import { NotebookProvider } from "./providers/NotebookProvider";
 import { BookProvider } from "./providers/BookProvider";
+import { ChatProvider } from "./providers/ChatProvider";
 // import Register from "./features/auth/Register";
 
 export default function App() {
@@ -10,9 +11,11 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <NotebookProvider>
-          <BookProvider>
-            <AppRouter />
-          </BookProvider>
+          <ChatProvider>
+            <BookProvider>
+              <AppRouter />
+            </BookProvider>
+            </ChatProvider>
         </NotebookProvider>
       </AuthProvider>
     </BrowserRouter>
