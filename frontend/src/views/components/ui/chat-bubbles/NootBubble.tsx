@@ -5,6 +5,25 @@ interface NootBubbleProps {
    role?: 'user' | 'assistant' | 'system'; 
 }
 
+// Helper to render **bold** and *italic* text
+function renderWithBoldAndItalic(text: string) {
+  // First, split by **...** for bold
+  const boldParts = text.split(/(\*\*[^*]+\*\*)/g);
+  return boldParts.map((part, idx) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      // Bold: remove **
+      return <strong key={idx}>{part.slice(2, -2)}</strong>;
+    } else {
+      // Now, split by *...* for italic inside non-bold parts
+      const italicParts = part.split(/(\*[^*]+\*)/g);
+      return italicParts.map((subPart, subIdx) =>
+        subPart.startsWith('*') && subPart.endsWith('*')
+          ? <em key={`${idx}-${subIdx}`}>{subPart.slice(1, -1)}</em>
+          : subPart
+      );
+    }
+  });
+}
 const NootBubble: React.FC<NootBubbleProps> = ({ message, role }) => {
 
   // Different styling based on message role
@@ -14,7 +33,7 @@ const NootBubble: React.FC<NootBubbleProps> = ({ message, role }) => {
 
   return (
     <div className={`w-full p-2 rounded-lg ${bubbleClasses}`}>
-      <p className='text-xs'>{message}</p>
+      <p className='text-xs'>{renderWithBoldAndItalic(message)}</p>
     </div>
   )
 

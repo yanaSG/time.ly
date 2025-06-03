@@ -2,7 +2,7 @@
 import React, {createContext, useContext, useState, useEffect, ReactNode} from "react";
 import chatService from '../services/chatService';
 
-
+// define the structure of a message
 interface Message {
   role: "system" | "user" | "assistant";
   content: string;
@@ -19,12 +19,15 @@ interface ChatContextType {
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
 const ChatProvider: React.FC<{children: ReactNode}> = ({children}) => {
+
   const clearMessages = () => {
+
     setMessages([{ role: "system", content: "You are a helpful assistant." }]);
     localStorage.removeItem("chat_messages");
   };
 
   // Initialize messages from localStorage or set default system message
+
   const [messages, setMessages] = useState<Message[]>(() => {
 
     // Attempt to retrieve messages from localStorage
@@ -56,7 +59,7 @@ const ChatProvider: React.FC<{children: ReactNode}> = ({children}) => {
 
   // State to manage user input
   const [userInput, setUserInput] = useState("");
-
+  
   // Persist messages in localStorage
   useEffect(() => {
     localStorage.setItem("chat_messages", JSON.stringify(messages));
@@ -81,15 +84,17 @@ const ChatProvider: React.FC<{children: ReactNode}> = ({children}) => {
 
     try {
       // Use chatService.chatbot instead of api.post directly
-      const res = await chatService.chatbot(updatedMessages);
+        const res = await chatService.chatbot(updatedMessages);
 
-      const assistantReply = res?.choices?.[0]?.message?.content || "No reply.";
-      //setMessages(prev => [...prev, { role: "assistant", content: assistantReply }]);
-      setMessages(prev => {
-        const newMessages = [...prev];
-        newMessages[loadingIndex] = { role: "assistant", content: assistantReply };
-        return newMessages;
-      });
+        // Remove the "think" part from the assistant's reply
+        const assistantReplyRaw = res?.choices?.[0]?.message?.content || "No reply.";
+       const assistantReply = assistantReplyRaw.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+
+        setMessages(prev => {
+          const newMessages = [...prev];
+          newMessages[loadingIndex] = { role: "assistant", content: assistantReply };
+          return newMessages;
+        });
 
     } catch (err) {
       //console.error("Chat API error:", err);
