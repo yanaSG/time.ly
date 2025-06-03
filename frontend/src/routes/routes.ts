@@ -113,15 +113,7 @@ export const NAV_ROUTES: AppRoute[] = [
       title: "Dashboard"
     }
   },
-  {
-    path: "/profile_setup",
-    element: React.createElement(loadComponent("Setup")),
-    layout: "MainLayout",
-    meta: {
-      // requiresAuth: true,
-      title: "Setup"
-    }
-  },
+ 
   {
     path: "/notebooks",
     element: React.createElement(loadComponent("Notebooks")),

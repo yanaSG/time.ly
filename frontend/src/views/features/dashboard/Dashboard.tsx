@@ -2,6 +2,8 @@ import React from 'react'
 import { useAuth } from '../../../hooks/useAuth';
 
 const Dashboard: React.FC = () => {
+  const { user } = useAuth();
+
   return (
     <div className="fixed flex flex-col relative pl-10 "> 
 
@@ -24,22 +26,27 @@ const Dashboard: React.FC = () => {
           </div>
 
           <div className="flex flex-row justify-center items-center items-start pt-10">
+            {/* If you have user.image, use it, else fallback */}
             <img 
-              src="../../../../../public/user-jennie.jpg" 
+              src={user?.image || "../../../../../public/user-jennie.jpg"} 
               alt="user" 
-              className=" h-45 w-45 rounded-lg shadow-lg"
+              className="h-45 w-45 rounded-lg shadow-lg object-cover"
             />
           
             <div className="flex flex-row align-center pl-10 mr-15">
               <div className="font-bold">
                 <p>Name:</p>
                 <p>Course: </p>
+                <p>School:</p>
                 <p>Likes: </p>
+                <p>Bio: </p>
               </div>
               <div className="pl-2">
-                <p>Jennie</p>
-                <p>Nursing</p>
-                <p>k-pop</p>
+                <p>{user ? `${user.fname || ''} ${user.lname || ''}` : ''}</p>
+                <p>{user?.course || ''}</p>
+                <p>{user?.school || ''}</p>
+                <p>{user?.likes || ''}</p>
+                <p>{user?.bio || ''}</p>
               </div>
             
             </div>

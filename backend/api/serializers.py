@@ -43,19 +43,30 @@ class RegisterSerializer(serializers.ModelSerializer):
 class UserProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['image', 'school', 'course', 'likes']
-        extra_kwargs = {
-            'image': {'required': False},
-            'school': {'required': False},
-            'course': {'required': False},
-            'likes': {'required': False},
-        }
-        
+        fields = [
+            'username', 'email', 'fname', 'lname',  
+            'image', 'school', 'course', 'likes', 'bio'
+        ]
+
 class UserProfileSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'email', 'fname', 'lname', 'role', 'image', 'school', 'course', 'likes']
-        read_only_fields = ['id', 'username', 'email', 'fname', 'lname', 'role', 'image', 'school', 'course', 'likes']
+        fields = [
+            'id', 'username', 'email', 'fname', 'lname', 'role',
+            'image', 'school', 'course', 'likes', 'bio'
+        ]
+        read_only_fields = fields
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image and hasattr(obj.image, 'url'):
+            url = obj.image.url
+            if request is not None:
+                return request.build_absolute_uri(url)
+            return url
+        return None
 
 class ObtainTokenSerializer(TokenObtainPairSerializer):
     username = serializers.CharField(required=True)

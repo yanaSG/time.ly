@@ -27,6 +27,11 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, related_name='books', to=settings.AUTH_USER_MODEL),
             preserve_default=False,
         ),
+        migrations.AddField(
+            model_name='customuser',
+            name='bio',
+            field=models.TextField(blank=True, null=True),
+        ),
         migrations.AlterField(
             model_name='book',
             name='id',
@@ -36,5 +41,10 @@ class Migration(migrations.Migration):
             model_name='customuser',
             name='id',
             field=models.AutoField(primary_key=True, serialize=False),
+        ),
+        migrations.AlterField(
+            model_name='customuser',
+            name='likes',
+            field=models.CharField(blank=True, max_length=255, null=True),
         ),
     ]

@@ -14,7 +14,8 @@ class CustomUser(AbstractUser):
     image = models.ImageField(upload_to='profile/', blank=True, null=True)
     course = models.CharField(max_length=100, blank=True, null=True)
     school = models.CharField(max_length=100, blank=True, null=True)
-    likes = models.PositiveIntegerField(default=0, blank=True, null=True)
+    likes = models.CharField(max_length=255, blank=True, null=True)  
+    bio = models.TextField(blank=True, null=True)  
 
     ROLE_CHOICES = [
         ('admin', 'Admin'),

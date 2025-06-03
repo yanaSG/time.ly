@@ -19,6 +19,8 @@ from django.urls import path
 from django.views import *
 from api.views import *
 from rest_framework_simplejwt.views import TokenRefreshView
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -41,3 +43,6 @@ urlpatterns = [
     path('api/notebooks/<int:notebook_id>/books/<int:pk>/summary/', BookSummaryDetailView.as_view(), name='document-summary-detail'),
     path('api/notebooks/<int:notebook_id>/books/titles/', BookTitleListView.as_view(), name='book-title-list')
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
