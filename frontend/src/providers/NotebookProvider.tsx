@@ -99,7 +99,7 @@ export const NotebookProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setIsLoading(true);
         try {
             await pinnedNotebookService.pinNotebook(notebookId, order);
-            await refreshUser(); // Refresh user data to get updated pinned notebooks
+            await refreshUser();
         } catch (err: any) {
             setError(err.response?.data?.detail || 'Failed to pin notebook');
             console.error('Failed to pin notebook:', err);
@@ -112,7 +112,7 @@ export const NotebookProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setIsLoading(true);
         try {
             await pinnedNotebookService.unpinNotebook(pinnedNotebookId);
-            await refreshUser(); // Refresh user data to get updated pinned notebooks
+            await refreshUser();
         } catch (err: any) {
             setError(err.response?.data?.detail || 'Failed to unpin notebook');
             console.error('Failed to unpin notebook:', err);

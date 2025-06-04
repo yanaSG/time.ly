@@ -51,6 +51,7 @@ urlpatterns = [
     path('api/notebooks/<int:notebook_id>/books/<int:pk>/download/', BookDownloadView.as_view(), name='document-download'),
     path('api/notebooks/<int:notebook_id>/books/<int:pk>/view/', BookViewInBrowser.as_view(), name='document-view'),
     path('api/notebooks/<int:notebook_id>/books/<int:pk>/summary/', BookSummaryDetailView.as_view(), name='document-summary-detail'),
+    path('api/notebooks/<int:notebook_id>/books/titles/', BookTitleListView.as_view(), name='book-title-list')
 ]
 
 if settings.DEBUG:

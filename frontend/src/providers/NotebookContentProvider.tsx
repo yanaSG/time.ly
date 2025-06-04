@@ -1,7 +1,6 @@
 // src/hooks/useNotebookContent.ts
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { useNotebooks } from '../providers/NotebookProvider';
 import { api } from '../api/client';
 
 interface NotebookContentApiResponse {
@@ -23,7 +22,6 @@ const NotebookContentContext = createContext<NotebookContentContextType | undefi
 
 export const NotebookContentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { user } = useAuth();
-    const { currentNotebook } = useNotebooks();
 
     const [currentContent, setCurrentContent] = useState<string | null>(null);
     const [contentUpdatedAt, setContentUpdatedAt] = useState<string | null>(null);
@@ -52,22 +50,20 @@ export const NotebookContentProvider: React.FC<{ children: React.ReactNode }> = 
         } finally {
             setIsLoading(false);
         }
-    }, [user]); // Dependency on user for getNotebookContent
+    }, [user]);
 
     const updateNotebookContent = useCallback(async (notebookId: number, content: string): Promise<void> => {
-        // New debug log: Check user status right at the start of the function
         console.log('useNotebookContent: Inside updateNotebookContent. User:', user);
         console.log('useNotebookContent: Attempting to update content for notebookId:', notebookId, 'with content:', content);
 
         setIsLoading(true);
         setError(null);
 
-        // This check is the most likely culprit if the previous log is not showing up
         if (!user) {
             setError('User not authenticated. Cannot save content.');
             console.error('useNotebookContent: User is null, skipping API call for update.');
             setIsLoading(false);
-            return; // Exit early if user is not authenticated
+            return;
         }
 
         try {
@@ -80,18 +76,7 @@ export const NotebookContentProvider: React.FC<{ children: React.ReactNode }> = 
         } finally {
             setIsLoading(false);
         }
-    }, [user]); // Dependency on user for updateNotebookContent
-
-    // useEffect(() => {
-    //     if (user && currentNotebook) {
-    //         setIsLoading(true);
-    //         getNotebookContent(currentNotebook.id);
-    //     } else {
-    //         setIsLoading(true);
-    //         setCurrentContent(null);
-    //     }
-    //     setIsLoading(false);
-    // }, [user, currentNotebook]);
+    }, [user]);
 
     const contextValue = {
         currentContent,

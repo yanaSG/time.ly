@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import MarkdownPreview from '@uiw/react-markdown-preview';
-import useDebounce from '../../../hooks/useDebounce'; // Ensure this path is correct
+import useDebounce from '../../../hooks/useDebounce';
 import { useNotebookContent } from '../../../providers/NotebookContentProvider';
 
 interface LineItem {
@@ -10,22 +10,19 @@ interface LineItem {
 }
 
 interface PageEditorProps {
-  notebook: number;
   initialContent: string | null;
   appendMarkdown: string | null;
   onContentChange: (content: string) => void;
   onAppendDone: () => void;
 }
 
-const PageEditor = ({ notebook, initialContent, appendMarkdown, onContentChange, onAppendDone }: PageEditorProps) => {
+const PageEditor = ({ initialContent, appendMarkdown, onContentChange, onAppendDone }: PageEditorProps) => {
   const { currentContent } = useNotebookContent();
-  // Helper to generate unique IDs for lines
+
   const generateUniqueId = useCallback(() => {
     return Date.now().toString() + Math.random().toString(36).substring(2, 9);
   }, []);
 
-  // Initialize editorLines state using a functional initializer.
-  // This runs ONLY ONCE when the component mounts (or remounts due to a changing key prop).
   const [editorLines, setEditorLines] = useState<LineItem[]>(() => {
     console.log('PageEditor: useState initializer. initialContent:', initialContent);
 
@@ -35,10 +32,10 @@ const PageEditor = ({ notebook, initialContent, appendMarkdown, onContentChange,
         content,
         isEditing: false,
       }));
-      // Ensure there's always an editable empty line at the end
+
       return [...lines, { id: generateUniqueId(), content: '', isEditing: true }];
     }
-    // If initialContent is empty or null, start with a single empty editable line.
+
     console.log('PageEditor: useState initializer: initialContent is empty/null, starting with empty line.');
     return [{ id: generateUniqueId(), content: '', isEditing: true }];
   });
@@ -46,30 +43,37 @@ const PageEditor = ({ notebook, initialContent, appendMarkdown, onContentChange,
   const textareaRefs = useRef<{ [key: string]: HTMLTextAreaElement | null }>({});
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Removed the previous complex useEffect for initialContent.
-  // The key prop on PageEditor in Note.tsx now handles remounting and re-initialization.
+  const lastProcessedAppendMarkdownRef = useRef<string | null>(null);
+  const debouncedAppendMarkdown = useDebounce(appendMarkdown, 2000);
 
-  // Effect to append markdown when appendMarkdown prop changes
   useEffect(() => {
-    if (appendMarkdown) {
-      console.log('PageEditor: Appending markdown:', appendMarkdown);
+    if (debouncedAppendMarkdown && debouncedAppendMarkdown !== lastProcessedAppendMarkdownRef.current) {
+      console.log('PageEditor: Appending markdown:', debouncedAppendMarkdown);
       setEditorLines(prevLines => {
-        const filteredPrevLines = prevLines.filter(line => line.content.trim() !== '');
+        const filteredPrevLines = prevLines.filter((line, index) => {
+          return !(line.content.trim() === '' && prevLines.length > 1 && index === prevLines.length - 1);
+        });
 
-        const newLines = appendMarkdown.split('\n').map(content => ({
+        const newLines = debouncedAppendMarkdown.split('\n').map(content => ({
           id: generateUniqueId(),
           content,
           isEditing: false,
         }));
 
-        const updatedLines = [...filteredPrevLines, ...newLines, { id: generateUniqueId(), content: '', isEditing: true }];
+        const updatedLines = [
+          ...filteredPrevLines,
+          ...newLines,
+          { id: generateUniqueId(), content: '', isEditing: true },
+        ];
         return updatedLines;
       });
+
+      lastProcessedAppendMarkdownRef.current = debouncedAppendMarkdown;
+
       onAppendDone();
     }
-  }, [appendMarkdown, onAppendDone, generateUniqueId]);
+  }, [debouncedAppendMarkdown, generateUniqueId, onAppendDone]);
 
-  // Auto-resize textareas and focus management
   useEffect(() => {
     const handleTextareaInput = (e: Event) => {
       const target = e.target as HTMLTextAreaElement;
@@ -102,7 +106,7 @@ const PageEditor = ({ notebook, initialContent, appendMarkdown, onContentChange,
     !(index === editorLines.length - 1 && line.content.trim() === '')
   ).map(line => line.content).join('\n');
 
-  const debouncedContent = useDebounce(fullContentForSave, 1000); // Debounce for 1 second (1000ms)
+  const debouncedContent = useDebounce(fullContentForSave, 1000);
 
   useEffect(() => {
     console.log('PageEditor: INITIAL CONTENT:', initialContent);
@@ -112,7 +116,7 @@ const PageEditor = ({ notebook, initialContent, appendMarkdown, onContentChange,
     } else {
       console.log('PageEditor: Debounced content is same as initialContent, skipping save.');
     }
-  }, [debouncedContent, onContentChange, initialContent]);
+  }, [debouncedContent, onContentChange, initialContent, currentContent]);
 
   const handleLineChange = (id: string, e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setEditorLines(prev => prev.map(line =>

@@ -5,22 +5,19 @@ import { useNotebooks } from '../../../providers/NotebookProvider';
 import FlashNotif from '../../components/ui/FlashNotif';
 import { useNavigate } from 'react-router-dom';
 import { useNotebookContent } from '../../../providers/NotebookContentProvider';
-import NotebookModal from '../../components/features/NotebookModal'; // Import the new modal component
+import NotebookModal from '../../components/features/NotebookModal';
 import { useBooks } from '../../../providers/BookProvider';
 
 const Notebooks: React.FC = () => {
-  const navigate = useNavigate(); // Hook to navigate between routes
+  const navigate = useNavigate();
 
-  // State to track created notebooks; each notebook is an object with id, name, and description
   const [showModal, setShowModal] = useState(false);
-  const { user } = useAuth(); // Get the current user from authentication context
+  const { user } = useAuth();
   const { notebooks, fetchNotebooks, addNotebook, getNotebookById, pinNotebook, unpinNotebook } = useNotebooks();
   const { getNotebookContent, currentContent } = useNotebookContent();
   const [flashMessage, setFlashMessage] = useState<string | null>(null);
   const { titles, getBookTitles } = useBooks();
 
-  // Effect to handle body overflow when modal is open
-  // This prevents scrolling of the background content when the modal is open
   useEffect(() => {
     if (showModal) {
       document.body.style.overflow = 'hidden';
@@ -29,11 +26,9 @@ const Notebooks: React.FC = () => {
     }
   }, [showModal]);
 
-  // Function to open and close the modal
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
 
-  // Function to handle form submission from the modal
   const handleAddNotebook = async (newNotebook: Omit<Notebook, "id" | "created_at" | "updated_at"> & { color: string; mastery_goal: string | null }) => {
     try {
       await addNotebook(newNotebook);
@@ -82,11 +77,9 @@ const Notebooks: React.FC = () => {
     const pinnedNotebook = user.pinned_notebooks?.find(p => p.notebook.id === notebook.id);
 
     if (pinnedNotebook) {
-      // If already pinned, unpin it
       await unpinNotebook(pinnedNotebook.id);
       setFlashMessage(`Notebook "${notebook.title}" unpinned.`);
     } else {
-      // If not pinned, try to pin it
       const currentPinnedOrders = user.pinned_notebooks?.map(p => p.order) || [];
       let nextOrder = 1;
       while (currentPinnedOrders.includes(nextOrder) && nextOrder <= 5) {
@@ -133,17 +126,6 @@ const Notebooks: React.FC = () => {
             <p>Add New Notebook</p>
           </div>
         </div>
-
-        <div className="p-4 w-1/2 flex justify-end items-center">
-          <input
-            type="text"
-            placeholder="Search Notebooks..."
-            className="w-100 p-3 h-1/2 rounded-full border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#FFD25E]"
-          />
-          <button className="bg-[#FFD25E] h-1/2 text-white rounded-full px-4 py-2 ml-2 hover:bg-[#E6B84F] transition-transform duration-300 hover:scale-105 cursor-pointer">
-            Search
-          </button>
-        </div>
       </div>
       {/* notebooks */}
       <div className="h-full w-full grid grid-cols-6 gap-5 pt-5 px-10">
@@ -161,12 +143,12 @@ const Notebooks: React.FC = () => {
                 className="absolute pl-2 h-42 w-auto z-0"
               />
             </div>
-            {/* You might want to use notebook.color here to dynamically set the background color */}
+
             <div className={`relative pl-4 pr-5 flex flex-col justify-center h-55 w-40 rounded-2xl z-10 shadow-lg ${notebook.color ? `bg-[${notebook.color}]` : 'bg-[#FFD25E]'}`}
-              style={{ backgroundColor: notebook.color || '#FFD25E' }}> {/* Use notebook.color if available */}
+              style={{ backgroundColor: notebook.color || '#FFD25E' }}>
               <h3 className="text-xl font-bold text-white">{notebook.title}</h3>
               <p className="text-white text-sm">{notebook.description}</p>
-              {notebook.mastery_goal && ( // Display mastery goal if it exists
+              {notebook.mastery_goal && (
                 <p className="text-white text-xs mt-2">Goal: {new Date(notebook.mastery_goal).toLocaleDateString()}</p>
               )}
               <button
@@ -189,7 +171,6 @@ const Notebooks: React.FC = () => {
         ))}
       </div>
 
-      {/* Modal for creating a new notebook */}
       <NotebookModal
         isOpen={showModal}
         onClose={closeModal}

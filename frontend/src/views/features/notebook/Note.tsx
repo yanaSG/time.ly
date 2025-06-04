@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import NoteSideBar from '../../components/features/NoteSideBar';
 import NoteAssistBar from '../../components/features/NoteAssistBar';
 import PageEditor from '../../components/features/PageEditor';
@@ -17,7 +17,7 @@ import ConfirmModal from '../../components/ui/ConfirmModal';
 const Note = () => {
   const navigate = useNavigate();
   const { currentNotebook, updateNotebook, fetchNotebooks, deleteNotebook } = useNotebooks();
-  const { titles, isLoading: isBookLoading, uploadBook } = useBooks();
+  const { titles, isLoading: isBookLoading, uploadBook, getBookTitles } = useBooks();
   const { user } = useAuth();
   const { currentContent, contentUpdatedAt, isLoading: isContentLoading, updateNotebookContent } = useNotebookContent();
 
@@ -49,6 +49,7 @@ const Note = () => {
 
           if (generatedMarkdown) {
             setMarkdownToAppend(generatedMarkdown);
+            await getBookTitles(currentNotebook.id);
           }
         } else {
           setFlashMessage('You must be logged in to upload files.');
@@ -84,9 +85,9 @@ const Note = () => {
   const handleUpdateNotebook = useCallback(async (notebookId: number, updatedFields: Omit<Notebook, "id" | "created_at" | "updated_at"> & { color?: string; mastery_goal?: string | null }) => {
     try {
       await updateNotebook(notebookId, updatedFields);
-      await fetchNotebooks(); // Re-fetch notebooks to update the list and currentNotebook in context
+      await fetchNotebooks();
       setFlashMessage('Notebook updated successfully!');
-      setEditModalOpen(false); // Close the modal on success
+      setEditModalOpen(false);
     } catch (error) {
       console.error('Note: Error updating notebook:', error);
       setFlashMessage(`Error updating notebook: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -97,7 +98,7 @@ const Note = () => {
     try {
       await deleteNotebook(notebookId);
       setFlashMessage('Notebook deleted successfully!');
-      navigate('/notebooks'); // Navigate back to notebooks list after deletion
+      navigate('/notebooks');
     } catch (error) {
       console.error('Note: Error deleting notebook:', error);
       setFlashMessage(`Error deleting notebook: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -107,17 +108,15 @@ const Note = () => {
 
   const overallLoading = isBookLoading || isContentLoading;
 
-  // Debugging: Log currentContent just before rendering PageEditor
   console.log('Note: currentContent being passed to PageEditor:', currentContent);
 
   return (
     <div className='w-full h-full p-5 bg-zinc-600/15'>
-      {/* Upload Modal */}
+
       {uploadModalOpen && (
         <UploadModal isOpen={uploadModalOpen} onClose={() => setUploadModalOpen(false)} onUpload={onUpload} />
       )}
 
-      {/* Confirm Delete Modal */}
       {confirmModalOpen && currentNotebook && (
         <ConfirmModal
           open={confirmModalOpen}
@@ -128,23 +127,20 @@ const Note = () => {
         />
       )}
 
-      {/* Edit Notebook Modal */}
       {editModalOpen && currentNotebook && (
         <NotebookModal
           isOpen={editModalOpen}
           onClose={() => setEditModalOpen(false)}
           onUpdateNotebook={handleUpdateNotebook}
-          initialNotebook={currentNotebook} // Pass the current notebook for editing
+          initialNotebook={currentNotebook}
           user={user}
         />
       )}
 
-      {/* Flash Notification */}
       {flashMessage && (
         <FlashNotif message={flashMessage} duration={3000} onClose={() => setFlashMessage(null)} />
       )}
 
-      {/* Overall Loading Indicator */}
       {overallLoading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
           <div className="bg-white px-6 py-4 rounded shadow text-[#037581] font-semibold">
@@ -153,11 +149,9 @@ const Note = () => {
         </div>
       )}
 
-      {/* Conditionally render the main content once loading is complete */}
-      {/* Ensure currentNotebook is available before rendering PageEditor with its key */}
       {!overallLoading && currentNotebook ? (
         <div className='w-full h-full flex bg-white/60 rounded-lg shadow-lg justify-between gap-5'>
-          {/* Note Sidebar */}
+
           <NoteSideBar
             uploadModalClick={() => setUploadModalOpen(!uploadModalOpen)}
             saveButtonClick={() => handleEditorContentChange(currentContent)}
@@ -170,10 +164,8 @@ const Note = () => {
             updatedAt={contentUpdatedAt ?? ''}
           />
 
-          {/* Page Editor */}
           <div className='w-full h-full py-4'>
             <PageEditor
-              notebook={currentNotebook.id}
               initialContent={currentContent}
               appendMarkdown={markdownToAppend}
               onContentChange={handleEditorContentChange}
@@ -181,7 +173,6 @@ const Note = () => {
             />
           </div>
 
-          {/* Note Assist Bar */}
           <NoteAssistBar books={titles} />
         </div>
       ) : (

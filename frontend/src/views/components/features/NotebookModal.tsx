@@ -1,43 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import { Notebook } from '../../../types/Notebook'; // Assuming Notebook type is accessible here
+import { Notebook } from '../../../types/Notebook';
 
 interface NotebookModalProps {
   isOpen: boolean;
   onClose: () => void;
-  // For adding a new notebook
   onAddNotebook?: (newNotebook: Omit<Notebook, "id" | "created_at" | "updated_at"> & { color: string; mastery_goal: string | null }) => Promise<void>;
-  // For updating an existing notebook
   onUpdateNotebook?: (notebookId: number, updatedFields: Omit<Notebook, "id" | "created_at" | "updated_at"> & { color?: string; mastery_goal?: string | null }) => Promise<void>;
-  initialNotebook?: Notebook | null; // Optional prop to pre-fill form for editing
-  user: any; // You might want to refine this type based on your actual user object
+  initialNotebook?: Notebook | null;
+  user: any;
 }
 
 const availableColors = [
-  "#F87171", // red
-  "#FBBF24", // yellow
-  "#34D399", // green
-  "#60A5FA", // blue
-  "#A78BFA", // purple
-  "#F472B6", // pink
-  "#FCD34D", // amber
-  "#6EE7B7", // teal
+  "#F87171",
+  "#FBBF24",
+  "#34D399",
+  "#60A5FA",
+  "#A78BFA",
+  "#F472B6",
+  "#FCD34D",
+  "#6EE7B7",
 ];
 
 const NotebookModal: React.FC<NotebookModalProps> = ({ isOpen, onClose, onAddNotebook, onUpdateNotebook, initialNotebook, user }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [color, setColor] = useState<string>('#F87171'); // Default color
+  const [color, setColor] = useState<string>('#F87171');
   const [masteryGoal, setMasteryGoal] = useState<string>('');
 
-  // Populate form fields if initialNotebook is provided (edit mode)
   useEffect(() => {
     if (isOpen && initialNotebook) {
       setTitle(initialNotebook.title || '');
       setDescription(initialNotebook.description || '');
-      setColor(initialNotebook.color || '#F87171'); // Use existing color or default
+      setColor(initialNotebook.color || '#F87171');
       setMasteryGoal(initialNotebook.mastery_goal ? new Date(initialNotebook.mastery_goal).toISOString().split('T')[0] : '');
     } else if (isOpen) {
-      // Reset for add mode
       setTitle('');
       setDescription('');
       setColor('#F87171');
@@ -59,7 +55,6 @@ const NotebookModal: React.FC<NotebookModalProps> = ({ isOpen, onClose, onAddNot
     }
 
     if (initialNotebook) {
-      // Update existing notebook
       if (onUpdateNotebook) {
         const updatedFields: Omit<Notebook, "id" | "created_at" | "updated_at"> & { color?: string; mastery_goal?: string } = {
           user_id: user.id,
@@ -71,7 +66,6 @@ const NotebookModal: React.FC<NotebookModalProps> = ({ isOpen, onClose, onAddNot
         await onUpdateNotebook(initialNotebook.id, updatedFields);
       }
     } else {
-      // Add new notebook
       if (onAddNotebook) {
         const newNotebookData: Omit<Notebook, "id" | "created_at" | "updated_at"> & { color: string; mastery_goal: string | null } = {
           user_id: user.id,
@@ -83,7 +77,7 @@ const NotebookModal: React.FC<NotebookModalProps> = ({ isOpen, onClose, onAddNot
         await onAddNotebook(newNotebookData);
       }
     }
-    onClose(); // Close modal after submission
+    onClose();
   };
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -143,7 +137,6 @@ const NotebookModal: React.FC<NotebookModalProps> = ({ isOpen, onClose, onAddNot
           />
         </div>
 
-        {/* Color Picker Field */}
         <div className="mb-4">
           <label className="block text-gray-700 font-semibold mb-1">
             Color
@@ -161,7 +154,6 @@ const NotebookModal: React.FC<NotebookModalProps> = ({ isOpen, onClose, onAddNot
           </div>
         </div>
 
-        {/* Mastery Goal Field */}
         <div className="mb-4">
           <label htmlFor="masteryGoal" className="block text-gray-700 font-semibold mb-1">
             Mastery Goal (Date)

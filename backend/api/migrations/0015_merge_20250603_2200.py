@@ -6,8 +6,8 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0011_merge_20250529_1832'),
-        ('api', '0014_notebook_color_notebook_mastery_goal'),
+        ('api', '0011_merge_20250530_1558'),
+        ('api', '0012_notebookcontent_remove_book_domain_book_notebook_and_more'),
     ]
 
     operations = [

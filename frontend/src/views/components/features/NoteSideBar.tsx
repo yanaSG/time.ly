@@ -35,7 +35,7 @@ const NoteSideBar: React.FC<NoteSideBarProps> = ({ notebook, noteTitle, masteryG
                 </div>
             </div>
 
-            <div className='flex flex-col gap-3'>
+            <div className='flex flex-col gap-3 h-full mt-7'>
                 <div className='flex flex-col'>
                     <h4 className='text-[#262F30] text-md font-bold'>{notebook}</h4>
                     <h6 className='text-[#262F30] text-sm font-semibold'>{noteTitle}</h6>
@@ -63,21 +63,6 @@ const NoteSideBar: React.FC<NoteSideBarProps> = ({ notebook, noteTitle, masteryG
                         </p>
                     </div>
 
-                    {/* <div className='flex flex-col gap-2'>
-                        <div>
-                            <p className='text-[#6C7778] text-xs'>Notes reviewed:</p>
-                            <div className="w-full bg-[#8BCBC0] rounded-full h-2.5">
-                                <div className="w-[60%] bg-[#5FA4A5] h-2.5 rounded-full"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <p className='text-[#6C7778] text-xs'>Completed sessions:</p>
-                            <div className="w-full bg-[#F2C2BD] rounded-full h-2.5">
-                                <div className="w-[30%] bg-[#EF988F] h-2.5 rounded-full"></div>
-                            </div>
-                        </div>
-                    </div> */}
-
                     <div>
                         <div className='flex gap-2'>
                             <h6 className='text-[#414A4B]/40 text-xs font-semibold'>Created at</h6>
@@ -89,22 +74,15 @@ const NoteSideBar: React.FC<NoteSideBarProps> = ({ notebook, noteTitle, masteryG
                         </div>
                     </div>
                 </div>
-
-                <div className='h-70 flex flex-col gap-2 border-t-2 border-zinc-300 pt-2 overflow-y-auto'>
-                    <h5 className='text-sm text-[#6C7778]'>Outline</h5>
-                    <div className='hover:bg-[#F2F2F2] rounded-lg p-2 cursor-pointer'>
-                        <h3 className='text-md text-[#6C7778] font-semibold'>Chapter 1: Intro</h3>
-                    </div>
-                </div>
             </div>
 
             <div className='flex flex-col gap-4'>
                 <SaveButton onClick={saveButtonClick} />
                 <UploadButton onClick={uploadModalClick} />
 
-                <div className='text-sm text-[#6C7778]'>
+                {/* <div className='text-sm text-[#6C7778]'>
                     Page 1 of 1
-                </div>
+                </div> */}
             </div>
         </div>
     )

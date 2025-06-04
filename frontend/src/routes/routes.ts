@@ -20,12 +20,12 @@ export type AppRoute = RouteObject & {
 };
 
 export const ROUTES: AppRoute[] = [
-  // {
-  //   path: "/",
-  //   element: React.createElement(loadComponent("Landing")),
-  //   layout: "MainLayout",
-  //   meta: { title: "Home" }
-  // },
+  {
+    path: "/",
+    element: React.createElement(loadComponent("Dashboard")),
+    layout: "MainLayout",
+    meta: { title: "Dashboard" }
+  },
   {
     path: "/login",
     element: React.createElement(loadComponent("Login")),

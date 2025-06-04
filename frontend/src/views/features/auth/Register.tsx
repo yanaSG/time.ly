@@ -13,11 +13,6 @@ interface RegisterForm {
   email: string;
   password: string;
   password2: string;
-  // added null fields to match the backend requirements
-  // image: null;
-  // school: null;
-  // course: null;
-  // likes: null;
 }
 
 const Register: React.FC = () => {
@@ -29,11 +24,6 @@ const Register: React.FC = () => {
     email: '',
     password: '',
     password2: '',
-    // added null fields to match the backend requirements
-    // image: null,
-    // school: null,
-    // course: null,
-    // likes: null
   });
   const [error, setError] = useState<string>('');
 

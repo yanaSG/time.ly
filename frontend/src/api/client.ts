@@ -5,7 +5,6 @@ const createApiClient = (): AxiosInstance => {
         baseURL: 'http://127.0.0.1:8000/api/',
     });
 
-    // Add request interceptor for auth token
     instance.interceptors.request.use((config) => {
         const token = localStorage.getItem('access_token');
         if (token && config.url && !config.url.endsWith('login/') && !config.url.endsWith('signup/')) {
@@ -14,7 +13,6 @@ const createApiClient = (): AxiosInstance => {
         return config;
     });
 
-    // Add response interceptor for error handling
     instance.interceptors.response.use(
         (response) => response,
         (error) => {

@@ -2,17 +2,15 @@ import React, { createContext, useState, ReactNode, useEffect, useCallback } fro
 import { useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
 import userService from '../services/userService';
-import { Notebook } from '../types/Notebook'; // Assuming Notebook type is defined here or imported
+import { Notebook } from '../types/Notebook';
 
-// Define the PinnedNotebook interface
 interface PinnedNotebook {
   id: number;
-  notebook: Notebook; // Nested Notebook object
-  notebook_id: number; // For sending to backend when pinning
+  notebook: Notebook;
+  notebook_id: number;
   order: number;
 }
 
-// Define the PostItNote interface
 interface PostItNote {
   title: string;
   text_content: string;
@@ -32,11 +30,11 @@ interface UserProfile {
   likes?: string;
   bio?: string;
   role?: string;
-  last_login_date?: string; // Added for streak
-  login_streak?: number; // Added for streak
-  activity_heatmap?: { [key: string]: number }; // Added for heatmap
-  pinned_notebooks?: PinnedNotebook[]; // Added for pinned notebooks
-  post_it_note?: PostItNote; // Added for post-it note
+  last_login_date?: string;
+  login_streak?: number;
+  activity_heatmap?: { [key: string]: number };
+  pinned_notebooks?: PinnedNotebook[]; 
+  post_it_note?: PostItNote;
 }
 
 interface AuthContextType {
@@ -64,8 +62,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       const response = await authService.login(data.username, data.password);
       localStorage.setItem('access_token', response.access);
       localStorage.setItem('refresh_token', response.refresh);
-      setToken(response.access); // Update token state to trigger refreshUser
-      // The user object in the response might contain updated streak/heatmap, but refreshUser will get the full profile
+      setToken(response.access);
       await refreshUser();
       navigate('/dashboard');
     } catch (error) {
@@ -100,13 +97,10 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
   const updatePostItNote = async (content: string) => {
     try {
-      // Check if a note already exists for the user
       if (user?.post_it_note) {
-        // If it exists, update it
         const updatedNote = await authService.updatePostItNote(content, user.post_it_note.title);
         setUser(prevUser => prevUser ? { ...prevUser, post_it_note: updatedNote } : null);
       } else {
-        // If it doesn't exist, create it
         const newNote = await authService.createPostItNote(content);
         setUser(prevUser => prevUser ? { ...prevUser, post_it_note: newNote } : null);
       }
@@ -132,7 +126,6 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     } catch (error) {
       setUser(null);
       console.error('Failed to refresh user profile:', error);
-      // If refresh fails, clear tokens and navigate to login
       logout();
     }
   }, []);
@@ -140,11 +133,9 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const updateUserActivity = async (date: string, duration_minutes: number) => {
   try {
     await userService.updateUserActivity(date, duration_minutes);
-    // Optionally refresh user profile to get updated heatmap immediately
     await refreshUser();
   } catch (error) {
     console.error('Failed to update user activity:', error);
-    // Handle error, e.g., show a notification
   }
 };
 

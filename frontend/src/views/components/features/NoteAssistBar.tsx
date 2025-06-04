@@ -1,5 +1,5 @@
-import React, { use, useState } from 'react'
-import { FaArrowRightFromBracket, FaArrowRightToBracket } from 'react-icons/fa6';
+import React, { useState } from 'react'
+import { FaArrowRightFromBracket } from 'react-icons/fa6';
 import { MdUpload } from "react-icons/md";
 import { SiChatbot } from "react-icons/si";
 import { TbPlayCardStar } from "react-icons/tb";
@@ -40,24 +40,6 @@ const NoteAssistBar: React.FC<NoteAssistBarProps> = ({ books }) => {
       setSuggestionTab(false);
     }
   }
-
-  // const openUploadTab = () => {
-  //   setUploadTab(true);
-  //   setChatTab(false);
-  //   setSuggestionTab(false);
-  // }
-
-  // const openChatTab = () => {
-  //   setChatTab(true);
-  //   setUploadTab(false);
-  //   setSuggestionTab(false);
-  // }
-
-  // const openSuggestionTab = () => {
-  //   setSuggestionTab(true);
-  //   setUploadTab(false);
-  //   setChatTab(false);
-  // }
 
   return (
     <div className={`w-15 h-full flex flex-col justify-start gap-1 bg-white/40 rounded-xl shadow-lg ${isOpen ? 'w-75' : ''} transform transition-all duration-200`}>

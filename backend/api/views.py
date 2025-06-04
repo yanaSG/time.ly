@@ -388,6 +388,18 @@ class BookDetailView(generics.RetrieveUpdateDestroyAPIView):
         obj = get_object_or_404(queryset, pk=self.kwargs["pk"])
         self.check_object_permissions(self.request, obj)
         return obj
+    
+class BookTitleListView(generics.ListAPIView):
+    serializer_class = BookResponseSerializer
+
+    def get_queryset(self):
+        notebook_id = self.kwargs.get("notebook_id")
+        return Book.objects.filter(notebook_id=notebook_id).only("id", "title")
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        titles = [{"id": book.id, "title": book.title} for book in queryset]
+        return Response(titles)
 
 class BookDownloadView(generics.RetrieveAPIView):
     serializer_class = BookResponseSerializer

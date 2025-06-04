@@ -22,8 +22,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       >
         {children || <Outlet />}
       </main>
-
-      {/* <Footer className="mt-auto" /> */}
     </div>
   );
 };
