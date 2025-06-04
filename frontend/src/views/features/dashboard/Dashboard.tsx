@@ -200,7 +200,7 @@ const Dashboard: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full">
               {/* User image with a fallback placeholder. Sizes adjusted for responsiveness. */}
               <img
-                src={user?.image || "https://placehold.co/180x180/E0F2F7/263438?text=User"}
+                src={user?.image || "/user-jennie.jpg"}
                 alt="user"
                 className="h-20 w-20 sm:h-24 sm:w-24 md:h-34 md:w-34 lg:h-35 lg:w-35 rounded-lg shadow-lg object-cover mb-2 sm:mb-0 sm:mr-4"
               />
@@ -222,7 +222,7 @@ const Dashboard: React.FC = () => {
                     <p className="truncate">
                       {user?.course && user.course.length > 34
                         ? `${user.course.slice(0, 34)}...`
-                        : user?.course || ''}
+                        : user?.course || 'Set your course in profile'}
                     </p>
                   </div>
                   <div>
@@ -230,7 +230,7 @@ const Dashboard: React.FC = () => {
                     <p className="truncate">
                       {user?.school && user.school.length > 34
                         ? `${user.school.slice(0, 34)}...`
-                        : user?.school || ''}
+                        : user?.school || 'Set your school in profile'}
                     </p>
                   </div>
                   <div>
@@ -238,7 +238,7 @@ const Dashboard: React.FC = () => {
                     <p className="truncate">
                       {user?.likes && user.likes.length > 34
                         ? `${user.likes.slice(0, 34)}...`
-                        : user?.likes || ''}
+                        : user?.likes || 'Set your likes in profile'}
                     </p>
                   </div>
                   <div>
@@ -246,7 +246,7 @@ const Dashboard: React.FC = () => {
                     <p className="truncate">
                       {user?.bio && user.bio.length > 34
                         ? `${user.bio.slice(0, 34)}...`
-                        : user?.bio || ''}
+                        : user?.bio || 'Set your bio in profile'}
                     </p>
                   </div>
                 </div>
@@ -351,30 +351,40 @@ const Dashboard: React.FC = () => {
             {/* Grid for notebook cards - highly responsive columns. */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 px-2 sm:px-4">
 
-              {pinnedNotebooks.map((pinned: any) => (
-                <div
-                  key={pinned.notebook.id}
-                  onClick={(event) => handleNotebookClick(event, pinned.notebook.id)}
-                  className="flex flex-col items-center transform transition-transform duration-300 hover:scale-105 cursor-pointer relative min-h-[180px]" // Added min-h for consistent card size
-                >
-                  {/* Adjusted image sizing and positioning to be relative to the card */}
-                  <img
-                    src="/binder.png"
-                    alt="Dashboard Illustration"
-                    className="absolute top-0 left-0 w-full h-full object-contain z-0 opacity-70" // Adjusted opacity for better text readability
-                  />
-                  {/* Adjusted card sizing to be flexible */}
-                  <div className={`relative flex flex-col justify-center p-4 rounded-2xl z-10 shadow-lg w-full h-full`}
-                    style={{ backgroundColor: pinned.notebook.color || '#FFD25E' }}>
-                    <h3 className="text-lg font-bold text-white mb-1 truncate">{pinned.notebook.title}</h3>
-                    {/* Using line-clamp for description to prevent overflow */}
-                    <p className="text-white text-sm mb-2 line-clamp-2">{pinned.notebook.description}</p>
-                    {pinned.notebook.mastery_goal && ( // Display mastery goal if it exists
-                      <p className="text-white text-xs mt-auto">Goal: {new Date(pinned.notebook.mastery_goal).toLocaleDateString()}</p>
-                    )}
-                  </div>
+              {pinnedNotebooks.length === 0 ? (
+                <div className="text-gray-500 text-center col-span-full py-8">
+                  No pinned notebooks
                 </div>
-              ))}
+              ) : (
+                pinnedNotebooks.map((pinned: any) => (
+                  <div
+                    key={pinned.notebook.id}
+                    onClick={(event) => handleNotebookClick(event, pinned.notebook.id)}
+                    className="flex flex-col items-center transform transition-transform duration-300 hover:scale-105 cursor-pointer relative min-h-[180px]"
+                  >
+                    {/* Adjusted image sizing and positioning to be relative to the card */}
+                    <img
+                      src="/binder.png"
+                      alt="Dashboard Illustration"
+                      className="absolute top-0 left-0 w-full h-full object-contain z-0 opacity-70"
+                    />
+                    {/* Adjusted card sizing to be flexible */}
+                    <div
+                      className={`relative flex flex-col justify-center p-4 rounded-2xl z-10 shadow-lg w-full h-full`}
+                      style={{ backgroundColor: pinned.notebook.color || '#FFD25E' }}
+                    >
+                      <h3 className="text-lg font-bold text-white mb-1 truncate">{pinned.notebook.title}</h3>
+                      {/* Using line-clamp for description to prevent overflow */}
+                      <p className="text-white text-sm mb-2 line-clamp-2">{pinned.notebook.description}</p>
+                      {pinned.notebook.mastery_goal && (
+                        <p className="text-white text-xs mt-auto">
+                          Goal: {new Date(pinned.notebook.mastery_goal).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

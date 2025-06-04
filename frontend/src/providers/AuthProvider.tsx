@@ -80,6 +80,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
       localStorage.setItem('access_token', response.access);
       localStorage.setItem('refresh_token', response.refresh);
       await refreshUser();
+      navigate('/dashboard');
     } catch (error) {
       console.error('Registration failed:', error);
       throw error;
