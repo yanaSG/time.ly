@@ -77,7 +77,6 @@ class RegisterView(generics.CreateAPIView):
             serializer.is_valid(raise_exception=True)
             user = serializer.save()
 
-            # Generate token for the newly registered user
             token = ObtainTokenSerializer.get_token(user)
 
             return Response({
@@ -125,18 +124,17 @@ class LoginView(generics.GenericAPIView):
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
-            # Update login streak only (heatmap activity will be tracked separately)
             today = date.today()
             if user.last_login_date:
                 if user.last_login_date == today - timedelta(days=1):
                     user.login_streak += 1
                 elif user.last_login_date != today:
-                    user.login_streak = 1 # Reset streak if not consecutive
+                    user.login_streak = 1
             else:
-                user.login_streak = 1 # Start streak for first login
+                user.login_streak = 1
 
             user.last_login_date = today
-            user.save() # Save the updated user object with streak
+            user.save()
 
             token = ObtainTokenSerializer.get_token(user)
             return Response({
@@ -147,7 +145,7 @@ class LoginView(generics.GenericAPIView):
                     'username': user.username,
                     'last_login_date': user.last_login_date,
                     'login_streak': user.login_streak,
-                    'activity_heatmap': user.activity_heatmap, # Still return current heatmap data
+                    'activity_heatmap': user.activity_heatmap,
                 }
             }, status=status.HTTP_200_OK)
         else:
@@ -168,14 +166,12 @@ class UserActivityView(generics.UpdateAPIView):
         activity_date_str = serializer.validated_data['date'].isoformat()
         duration_minutes = serializer.validated_data['duration_minutes']
 
-        # Get current heatmap, or initialize if empty
         heatmap = user.activity_heatmap if user.activity_heatmap is not None else {}
 
-        # Add the new duration to the existing duration for that day
         heatmap[activity_date_str] = heatmap.get(activity_date_str, 0) + duration_minutes
 
         user.activity_heatmap = heatmap
-        user.save(update_fields=['activity_heatmap']) # Only update the heatmap field
+        user.save(update_fields=['activity_heatmap'])
 
         return Response({
             "status": "success",
@@ -228,24 +224,20 @@ class PinnedNotebookListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # Only return pinned notebooks for the authenticated user, ordered by 'order'
         return PinnedNotebook.objects.filter(user=self.request.user).order_by('order')
 
     def perform_create(self, serializer):
-        # The serializer's create method handles the notebook and order logic
         serializer.save(user=self.request.user)
 
 class PinnedNotebookDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PinnedNotebookSerializer
     permission_classes = [IsAuthenticated]
-    lookup_field = 'pk' # Use 'pk' for the primary key of PinnedNotebook
+    lookup_field = 'pk'
 
     def get_queryset(self):
-        # Ensure only the user's own pinned notebooks can be accessed
         return PinnedNotebook.objects.filter(user=self.request.user)
 
     def perform_update(self, serializer):
-        # Ensure the user cannot change the 'user' field
         serializer.save(user=self.request.user)
 
 class PostItNoteView(generics.RetrieveUpdateDestroyAPIView):
@@ -253,8 +245,6 @@ class PostItNoteView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
-        # Retrieve the single PostItNote for the authenticated user
-        # If it doesn't exist, return None, and the create method will handle it for POST requests
         try:
             return self.request.user.post_it_note
         except PostItNote.DoesNotExist:
@@ -263,19 +253,17 @@ class PostItNoteView(generics.RetrieveUpdateDestroyAPIView):
     def get(self, request, *args, **kwargs):
         instance = self.get_object()
         if instance is None:
-            # If no note exists, return a 404 or an empty response, depending on desired client behavior
             return Response({"detail": "No post-it note found for this user."}, status=status.HTTP_404_NOT_FOUND)
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
     def post(self, request, *args, **kwargs):
-        # Allow creating the note if it doesn't exist yet
         if self.get_object() is not None:
             return Response({"detail": "A post-it note already exists for this user. Use PUT or PATCH to update."},
                             status=status.HTTP_400_BAD_REQUEST)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(user=self.request.user) # Ensure the note is linked to the current user
+        serializer.save(user=self.request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def put(self, request, *args, **kwargs):

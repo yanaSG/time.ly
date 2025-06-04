@@ -25,12 +25,9 @@ class CustomUser(AbstractUser):
 
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='user')
 
-    # Fields for login streaks and heatmap
     last_login_date = models.DateField(null=True, blank=True)
     login_streak = models.IntegerField(default=0)
-    activity_heatmap = models.JSONField(default=dict) # Stores activity for heatmap
-
-    # Pinned notebooks
+    activity_heatmap = models.JSONField(default=dict)
     pinned_notebooks = models.ManyToManyField('Notebook', through='PinnedNotebook', related_name='pinned_by_users')
 
 class Notebook(models.Model):
@@ -62,26 +59,24 @@ class PinnedNotebook(models.Model):
     )
 
     class Meta:
-        unique_together = ('user', 'notebook') # A notebook can only be pinned once by a user
-        ordering = ['order'] # Ensure pinned notebooks are ordered
+        unique_together = ('user', 'notebook')
+        ordering = ['order']
         constraints = [
             models.UniqueConstraint(fields=['user', 'order'], name='unique_user_order_pinned_notebook')
-        ] # Ensure a user can only have one notebook at a given order
+        ]
 
     def __str__(self):
         return f"{self.user.username}'s Pinned: {self.notebook.title} (Order: {self.order})"
 
 class PostItNote(models.Model):
-    # Changed to OneToOneField, each user can have only one PostItNote
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True, related_name='post_it_note')
     title = models.CharField(max_length=100, blank=True, default="Untitled Note")
     text_content = models.TextField(default="")
-    # Removed 'color' field as requested
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-updated_at'] # Order by most recently updated
+        ordering = ['-updated_at']
 
     def __str__(self):
         return f"Note by {self.user.username}: {self.title[:30]}..."
@@ -102,7 +97,7 @@ class Book(models.Model):
     notebook = models.ForeignKey(Notebook, on_delete=models.CASCADE, related_name='books', null=True, blank=True)
     title = models.CharField(max_length=255)
     original_filename = models.CharField(max_length=255, blank=True)
-    pdf_data = models.BinaryField()  # BLOB storage
+    pdf_data = models.BinaryField()
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

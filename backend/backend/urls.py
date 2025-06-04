@@ -32,19 +32,16 @@ urlpatterns = [
 
     path("api/chat/", chat_with_deepseek),
 
-    # New URL for user activity tracking
     path('api/user-activity/', UserActivityView.as_view(), name='user-activity'),
 
     path('api/notebooks/', NotebookListCreateView.as_view(), name='notebook-list-create'),
     path('api/notebooks/<int:pk>/', NotebookDetailView.as_view(), name='notebook-detail'),
     path('api/notebooks/<int:notebook>/content/', NotebookContentView.as_view(), name='notebook-content'),
 
-    # URLs for pinned notebooks
     path('api/pinned-notebooks/', PinnedNotebookListCreateView.as_view(), name='pinned-notebook-list-create'),
     path('api/pinned-notebooks/<int:pk>/', PinnedNotebookDetailView.as_view(), name='pinned-notebook-detail'),
 
-    # URLs for post-it notes (singular endpoint for one-to-one relationship)
-    path('api/post-it-note/', PostItNoteView.as_view(), name='post-it-note'), # Changed to singular and removed PK
+    path('api/post-it-note/', PostItNoteView.as_view(), name='post-it-note'),
 
     path('api/notebooks/<int:notebook_id>/books/', BookListCreateView.as_view(), name='document-list'),
     path('api/notebooks/<int:notebook_id>/books/<int:pk>/', BookDetailView.as_view(), name='document-detail'),

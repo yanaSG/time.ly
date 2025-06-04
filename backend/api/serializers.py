@@ -21,7 +21,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         user = CustomUser (**validated_data)
         user.set_password(validated_data['password'])
         user.save()
-        # Create a PostItNote for the new user
         PostItNote.objects.create(user=user, title=f"{user.username}'s Note", text_content="")
         return user
 
@@ -61,7 +60,6 @@ class NotebookSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 class PinnedNotebookSerializer(serializers.ModelSerializer):
-    # Nested serializer to display notebook details within the pinned notebook
     notebook = NotebookSerializer(read_only=True)
     notebook_id = serializers.PrimaryKeyRelatedField(queryset=Notebook.objects.all(), write_only=True, source='notebook')
 
@@ -71,7 +69,6 @@ class PinnedNotebookSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
     def validate(self, data):
-        # Ensure the user is provided in the context for validation
         if 'request' not in self.context or not self.context['request'].user.is_authenticated:
             raise serializers.ValidationError("Authentication required for pinning notebooks.")
 
@@ -79,23 +76,19 @@ class PinnedNotebookSerializer(serializers.ModelSerializer):
         notebook_to_pin = data.get('notebook') or self.instance.notebook if self.instance else None
         order = data.get('order') or self.instance.order if self.instance else None
 
-        # If creating, or updating the notebook, check if the notebook belongs to the user
         if notebook_to_pin and notebook_to_pin.user != user:
             raise serializers.ValidationError("You can only pin your own notebooks.")
 
-        # Check if the notebook is already pinned by the user (for create operations)
         if self.instance is None and PinnedNotebook.objects.filter(user=user, notebook=notebook_to_pin).exists():
             raise serializers.ValidationError("This notebook is already pinned.")
 
-        # Check if the order is already taken by another pinned notebook for the user
         if order:
             existing_pinned_at_order = PinnedNotebook.objects.filter(user=user, order=order)
-            if self.instance: # If updating, exclude the current instance from the check
+            if self.instance:
                 existing_pinned_at_order = existing_pinned_at_order.exclude(pk=self.instance.pk)
             if existing_pinned_at_order.exists():
                 raise serializers.ValidationError(f"Order position {order} is already taken by another pinned notebook.")
 
-        # Check the maximum limit of 5 pinned notebooks for create operations
         if self.instance is None and PinnedNotebook.objects.filter(user=user).count() >= 5:
             raise serializers.ValidationError("You can only pin a maximum of 5 notebooks.")
 
@@ -103,17 +96,16 @@ class PinnedNotebookSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = self.context['request'].user
-        notebook = validated_data.pop('notebook') # Get the notebook instance from the validated data
+        notebook = validated_data.pop('notebook')
         order = validated_data.get('order')
 
-        # If order is not provided, find the next available order
         if order is None:
             existing_orders = PinnedNotebook.objects.filter(user=user).values_list('order', flat=True)
-            for i in range(1, 6): # Check orders from 1 to 5
+            for i in range(1, 6):
                 if i not in existing_orders:
                     order = i
                     break
-            if order is None: # Should not happen if validation for max 5 notebooks is correct
+            if order is None:
                 raise serializers.ValidationError("Could not determine an available order for pinning.")
 
         return PinnedNotebook.objects.create(user=user, notebook=notebook, order=order)
@@ -122,29 +114,24 @@ class PostItNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostItNote
         fields = ['title', 'text_content', 'created_at', 'updated_at']
-        read_only_fields = ['created_at', 'updated_at'] # 'id' is now the user's PK, so it's not explicitly listed
+        read_only_fields = ['created_at', 'updated_at']
 
     def create(self, validated_data):
-        # For OneToOneField, the primary key is the user's ID
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        # Ensure that the user field is not updated for a OneToOneField
         validated_data.pop('user', None)
         return super().update(instance, validated_data)
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
-    # Include new fields for streaks, heatmap, and pinned notebooks
     last_login_date = serializers.DateField(read_only=True)
     login_streak = serializers.IntegerField(read_only=True)
     activity_heatmap = serializers.JSONField(read_only=True)
-    # Use the PinnedNotebookSerializer to serialize the many-to-many relationship
     pinned_notebooks = PinnedNotebookSerializer(source='pinnednotebook_set', many=True, read_only=True)
-    # Post-it note is now a single object, not a list
-    post_it_note = PostItNoteSerializer(read_only=True) # Changed from 'post_it_notes' to 'post_it_note', and many=False
+    post_it_note = PostItNoteSerializer(read_only=True)
 
     class Meta:
         model = CustomUser
@@ -152,9 +139,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'id', 'username', 'email', 'fname', 'lname', 'role',
             'image', 'school', 'course', 'likes', 'bio',
             'last_login_date', 'login_streak', 'activity_heatmap', 'pinned_notebooks',
-            'post_it_note' # Changed from 'post_it_notes' to 'post_it_note'
+            'post_it_note'
         ]
-        read_only_fields = fields # All fields are read-only for this serializer as it's for retrieval
+        read_only_fields = fields
 
     def get_image(self, obj):
         request = self.context.get('request')
@@ -176,11 +163,8 @@ class ObtainTokenSerializer(TokenObtainPairSerializer):
         return token
 
 class UserActivitySerializer(serializers.Serializer):
-    # Date for which activity is being reported (e.g., '2023-10-27')
     date = serializers.DateField(required=True)
-    # Duration of activity in minutes
     duration_minutes = serializers.IntegerField(required=True, min_value=0)
-
 
 class NotebookContentSerializer(serializers.ModelSerializer):
     class Meta:
