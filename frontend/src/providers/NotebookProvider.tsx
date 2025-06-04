@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Notebook } from '../types/Notebook';
 import notebookService from '../services/notebookService';
 import { useAuth } from '../hooks/useAuth';
+import pinnedNotebookService from '../services/pinnedNotebookService';
 
 interface NotebookContextType {
     notebooks: Notebook[];
@@ -13,6 +14,8 @@ interface NotebookContextType {
     addNotebook: (notebook: Omit<Notebook, "id" | "created_at" | "updated_at">) => Promise<any>;
     updateNotebook: (id: number, notebook: Omit<Notebook, "id" | "created_at" | "updated_at">) => Promise<any>;
     deleteNotebook: (id: number) => Promise<any>;
+    pinNotebook: (notebookId: number, order?: number) => Promise<void>;
+    unpinNotebook: (pinnedNotebookId: number) => Promise<void>;
 }
 
 const NotebookContext = createContext<NotebookContextType | undefined>(undefined);
@@ -22,7 +25,7 @@ export const NotebookProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const [currentNotebook, setCurrentNotebook] = useState<Notebook | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const { user } = useAuth();
+    const { user, refreshUser } = useAuth();
 
     const fetchNotebooks = async () => {
         setIsLoading(true);
@@ -92,6 +95,32 @@ export const NotebookProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
     };
 
+    const pinNotebook = async (notebookId: number, order?: number) => {
+        setIsLoading(true);
+        try {
+            await pinnedNotebookService.pinNotebook(notebookId, order);
+            await refreshUser(); // Refresh user data to get updated pinned notebooks
+        } catch (err: any) {
+            setError(err.response?.data?.detail || 'Failed to pin notebook');
+            console.error('Failed to pin notebook:', err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const unpinNotebook = async (pinnedNotebookId: number) => {
+        setIsLoading(true);
+        try {
+            await pinnedNotebookService.unpinNotebook(pinnedNotebookId);
+            await refreshUser(); // Refresh user data to get updated pinned notebooks
+        } catch (err: any) {
+            setError(err.response?.data?.detail || 'Failed to unpin notebook');
+            console.error('Failed to unpin notebook:', err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     useEffect(() => {
         if (user) {
             fetchNotebooks();
@@ -108,7 +137,9 @@ export const NotebookProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             getNotebookById,
             addNotebook,
             updateNotebook,
-            deleteNotebook
+            deleteNotebook,
+            pinNotebook,
+            unpinNotebook 
         }}>
             {children}
         </NotebookContext.Provider>

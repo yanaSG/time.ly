@@ -7,7 +7,7 @@ Examples:
 Function views
     1. Add an import:  from my_app import views
     2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
+    Class-based views
     1. Add an import:  from other_app.views import Home
     2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
 Including another URLconf
@@ -32,16 +32,25 @@ urlpatterns = [
 
     path("api/chat/", chat_with_deepseek),
 
+    # New URL for user activity tracking
+    path('api/user-activity/', UserActivityView.as_view(), name='user-activity'),
+
     path('api/notebooks/', NotebookListCreateView.as_view(), name='notebook-list-create'),
     path('api/notebooks/<int:pk>/', NotebookDetailView.as_view(), name='notebook-detail'),
     path('api/notebooks/<int:notebook>/content/', NotebookContentView.as_view(), name='notebook-content'),
+
+    # URLs for pinned notebooks
+    path('api/pinned-notebooks/', PinnedNotebookListCreateView.as_view(), name='pinned-notebook-list-create'),
+    path('api/pinned-notebooks/<int:pk>/', PinnedNotebookDetailView.as_view(), name='pinned-notebook-detail'),
+
+    # URLs for post-it notes (singular endpoint for one-to-one relationship)
+    path('api/post-it-note/', PostItNoteView.as_view(), name='post-it-note'), # Changed to singular and removed PK
 
     path('api/notebooks/<int:notebook_id>/books/', BookListCreateView.as_view(), name='document-list'),
     path('api/notebooks/<int:notebook_id>/books/<int:pk>/', BookDetailView.as_view(), name='document-detail'),
     path('api/notebooks/<int:notebook_id>/books/<int:pk>/download/', BookDownloadView.as_view(), name='document-download'),
     path('api/notebooks/<int:notebook_id>/books/<int:pk>/view/', BookViewInBrowser.as_view(), name='document-view'),
     path('api/notebooks/<int:notebook_id>/books/<int:pk>/summary/', BookSummaryDetailView.as_view(), name='document-summary-detail'),
-    path('api/notebooks/<int:notebook_id>/books/titles/', BookTitleListView.as_view(), name='book-title-list')
 ]
 
 if settings.DEBUG:

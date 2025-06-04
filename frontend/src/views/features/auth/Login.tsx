@@ -15,11 +15,6 @@ const Login: React.FC = () => {
   const [formData, setFormData] = useState<LoginForm>({ username: '', password: '' });
   const [error, setError] = useState<string>('');
 
-  // const validateEmail = (email: string) => {
-  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  //   return emailRegex.test(email);
-  // };
-
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -28,26 +23,21 @@ const Login: React.FC = () => {
       return;
     }
 
-    // if (!validateEmail(formData.email)) {
-    //   setError('Please enter a valid email address.');
-    //   return;
-    // }
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      return;
+    }
 
-    // if (formData.password.length < 6) {
-    //   setError('Password must be at least 6 characters long.');
-    //   return;
-    // }
-
-    // if (formData.username.length < 6) {
-    //   setError('Username must be at least 6 characters long.');
-    //   return;
-    // }
+    if (formData.username.length < 6) {
+      setError('Username must be at least 6 characters long.');
+      return;
+    }
 
     try {
       console.log('Sent login data:', formData);
       await login(formData);
     } catch (error: any) {
-      setError(error.message);
+      setError(error.response?.data?.error);
     }
   };
 

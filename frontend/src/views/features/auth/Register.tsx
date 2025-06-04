@@ -79,7 +79,18 @@ const Register: React.FC = () => {
       console.log('Sent register data:', formData);
       await register(formData);
     } catch (error: any) {
-      setError(error.message);
+      const errors = error.response?.data?.errors;
+      if (errors?.email) {
+        setError(errors.email[0]);
+      } else if (errors?.username) {
+        setError(errors.username[0]);
+      } else if (errors?.password) {
+        setError(typeof errors.password === 'string' ? errors.password : errors.password[0]);
+      } else if (typeof error.message === 'string') {
+        setError(error.message);
+      } else {
+        setError("Registration failed");
+      }
     }
   };
 

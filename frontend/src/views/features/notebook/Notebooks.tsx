@@ -14,7 +14,7 @@ const Notebooks: React.FC = () => {
   // State to track created notebooks; each notebook is an object with id, name, and description
   const [showModal, setShowModal] = useState(false);
   const { user } = useAuth(); // Get the current user from authentication context
-  const { notebooks, fetchNotebooks, addNotebook, getNotebookById } = useNotebooks();
+  const { notebooks, fetchNotebooks, addNotebook, getNotebookById, pinNotebook, unpinNotebook } = useNotebooks();
   const { getNotebookContent, currentContent } = useNotebookContent();
   const [flashMessage, setFlashMessage] = useState<string | null>(null);
   const { titles, getBookTitles } = useBooks();
@@ -64,6 +64,41 @@ const Notebooks: React.FC = () => {
     } catch (error) {
       console.error('Error fetching notebook:', error);
       alert('Failed to fetch notebook');
+    }
+  };
+
+  const isNotebookPinned = (notebookId: number) => {
+    return user?.pinned_notebooks?.some(p => p.notebook.id === notebookId) || false;
+  };
+
+  const handlePinToggle = async (notebook: Notebook) => {
+    if (!user) return;
+
+    if (user.pinned_notebooks && user.pinned_notebooks.length >= 5 && !isNotebookPinned(notebook.id)) {
+      setFlashMessage('You can only pin a maximum of 5 notebooks. Please unpin one first.');
+      return;
+    }
+
+    const pinnedNotebook = user.pinned_notebooks?.find(p => p.notebook.id === notebook.id);
+
+    if (pinnedNotebook) {
+      // If already pinned, unpin it
+      await unpinNotebook(pinnedNotebook.id);
+      setFlashMessage(`Notebook "${notebook.title}" unpinned.`);
+    } else {
+      // If not pinned, try to pin it
+      const currentPinnedOrders = user.pinned_notebooks?.map(p => p.order) || [];
+      let nextOrder = 1;
+      while (currentPinnedOrders.includes(nextOrder) && nextOrder <= 5) {
+        nextOrder++;
+      }
+
+      if (nextOrder <= 5) {
+        await pinNotebook(notebook.id, nextOrder);
+        setFlashMessage(`Notebook "${notebook.title}" pinned!`);
+      } else {
+        setFlashMessage('You can only pin a maximum of 5 notebooks. Please unpin one first.');
+      }
     }
   };
 
@@ -117,7 +152,7 @@ const Notebooks: React.FC = () => {
           <div
             key={notebook.id}
             onClick={(event) => handleNotebookClick(event, notebook.id)}
-            className="flex flex-wrap gap-5 transform transition-transform duration-300 hover:scale-105 cursor-pointer"
+            className="group flex flex-wrap gap-5 transform transition-transform duration-300 hover:scale-105 cursor-pointer"
           >
             <div className="pt-6">
               <img
@@ -127,13 +162,28 @@ const Notebooks: React.FC = () => {
               />
             </div>
             {/* You might want to use notebook.color here to dynamically set the background color */}
-            <div className={`pl-4 pr- 5 flex flex-col justify-center h-55 w-40 rounded-2xl z-10 shadow-lg ${notebook.color ? `bg-[${notebook.color}]` : 'bg-[#FFD25E]'}`}
-                 style={{ backgroundColor: notebook.color || '#FFD25E' }}> {/* Use notebook.color if available */}
+            <div className={`relative pl-4 pr-5 flex flex-col justify-center h-55 w-40 rounded-2xl z-10 shadow-lg ${notebook.color ? `bg-[${notebook.color}]` : 'bg-[#FFD25E]'}`}
+              style={{ backgroundColor: notebook.color || '#FFD25E' }}> {/* Use notebook.color if available */}
               <h3 className="text-xl font-bold text-white">{notebook.title}</h3>
               <p className="text-white text-sm">{notebook.description}</p>
               {notebook.mastery_goal && ( // Display mastery goal if it exists
                 <p className="text-white text-xs mt-2">Goal: {new Date(notebook.mastery_goal).toLocaleDateString()}</p>
               )}
+              <button
+                onClick={(e) => { e.stopPropagation(); handlePinToggle(notebook); }}
+                className={`hidden group-hover:flex absolute top-2 right-2 rounded-full p-1 focus:outline-none ${isNotebookPinned(notebook.id) ? 'bg-red-500 hover:bg-red-600 text-white' : 'bg-white hover:bg-gray-200 text-gray-800'}`}
+                title={isNotebookPinned(notebook.id) ? "Unpin Notebook" : "Pin Notebook"}
+              >
+                {isNotebookPinned(notebook.id) ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+                  </svg>
+                )}
+              </button>
             </div>
           </div>
         ))}

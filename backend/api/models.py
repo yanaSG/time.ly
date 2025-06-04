@@ -1,5 +1,6 @@
-from django.contrib.auth.models import AbstractUser 
+from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 class CustomUser(AbstractUser):
     id = models.AutoField(primary_key=True)
@@ -14,15 +15,23 @@ class CustomUser(AbstractUser):
     image = models.ImageField(upload_to='profile/', blank=True, null=True)
     course = models.CharField(max_length=100, blank=True, null=True)
     school = models.CharField(max_length=100, blank=True, null=True)
-    likes = models.CharField(max_length=255, blank=True, null=True)  
-    bio = models.TextField(blank=True, null=True)  
+    likes = models.CharField(max_length=255, blank=True, null=True)
+    bio = models.TextField(blank=True, null=True)
 
     ROLE_CHOICES = [
         ('admin', 'Admin'),
         ('user', 'User'),
     ]
-    
+
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='user')
+
+    # Fields for login streaks and heatmap
+    last_login_date = models.DateField(null=True, blank=True)
+    login_streak = models.IntegerField(default=0)
+    activity_heatmap = models.JSONField(default=dict) # Stores activity for heatmap
+
+    # Pinned notebooks
+    pinned_notebooks = models.ManyToManyField('Notebook', through='PinnedNotebook', related_name='pinned_by_users')
 
 class Notebook(models.Model):
     id = models.AutoField(primary_key=True)
@@ -36,14 +45,48 @@ class Notebook(models.Model):
 
     def __str__(self):
         return self.title
-    
+
     def save(self, *args, **kwargs):
         is_new = self._state.adding
         super().save(*args, **kwargs)
 
         if is_new:
             NotebookContent.objects.create(notebook=self)
-    
+
+class PinnedNotebook(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    notebook = models.ForeignKey(Notebook, on_delete=models.CASCADE)
+    order = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        help_text="Order of the pinned notebook (1-5)"
+    )
+
+    class Meta:
+        unique_together = ('user', 'notebook') # A notebook can only be pinned once by a user
+        ordering = ['order'] # Ensure pinned notebooks are ordered
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'order'], name='unique_user_order_pinned_notebook')
+        ] # Ensure a user can only have one notebook at a given order
+
+    def __str__(self):
+        return f"{self.user.username}'s Pinned: {self.notebook.title} (Order: {self.order})"
+
+class PostItNote(models.Model):
+    # Changed to OneToOneField, each user can have only one PostItNote
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, primary_key=True, related_name='post_it_note')
+    title = models.CharField(max_length=100, blank=True, default="Untitled Note")
+    text_content = models.TextField(default="")
+    # Removed 'color' field as requested
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-updated_at'] # Order by most recently updated
+
+    def __str__(self):
+        return f"Note by {self.user.username}: {self.title[:30]}..."
+
+
 class NotebookContent(models.Model):
     notebook = models.OneToOneField(Notebook, on_delete=models.CASCADE, primary_key=True, related_name='content_object')
     markdown_content = models.TextField(blank=True, default='')
@@ -69,11 +112,11 @@ class BookSummary(models.Model):
     markdown = models.TextField(blank=True)
     sections = models.JSONField(default=list)
     key_terms = models.JSONField(default=list)
-    
+
     page_count = models.IntegerField()
     processing_time = models.FloatField(null=True, blank=True)
     model_used = models.CharField(max_length=100, default='deepseek-chat')
-    
+
     PROCESSING_STATUS = (
         ('pending', 'Pending'),
         ('completed', 'Completed'),
@@ -81,7 +124,7 @@ class BookSummary(models.Model):
     )
     status = models.CharField(max_length=20, choices=PROCESSING_STATUS, default='pending')
     last_updated = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
         return f"Summary of {self.book.title} ({self.status})"
 
