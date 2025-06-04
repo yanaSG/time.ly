@@ -13,6 +13,7 @@ import NotebookModal from '../../components/features/NotebookModal';
 import { Notebook } from '../../../types/Notebook';
 import ConfirmModal from '../../components/ui/ConfirmModal';
 
+
 const Note = () => {
   const navigate = useNavigate();
   const { currentNotebook, updateNotebook, fetchNotebooks, deleteNotebook } = useNotebooks();

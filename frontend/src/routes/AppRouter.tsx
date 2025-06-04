@@ -4,7 +4,7 @@ import { ROUTES } from "./routes";
 import LoadingSpinner from "../views/components/ui/LoadingSpinner";
 import RequireAuth from "./guards/RequireAuth";
 
-//     used to load layouts
+//  used to load layouts
 const loadComponent = (componentName: string) => {
   return lazy(async () => {
     const module = await import(`../views/components/layout`) as Record<string, React.ComponentType>;
@@ -14,6 +14,7 @@ const loadComponent = (componentName: string) => {
     return { default: module[componentName] };
   });
 };
+
 
 // Define the layout components that can be used in the routes
 const LAYOUT_COMPONENTS = {

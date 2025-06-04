@@ -92,6 +92,7 @@ class NotebookContent(models.Model):
     markdown_content = models.TextField(blank=True, default='')
     updated_at = models.DateTimeField(auto_now=True)
 
+
     def __str__(self):
         return f"Content for {self.notebook.title}"
 
