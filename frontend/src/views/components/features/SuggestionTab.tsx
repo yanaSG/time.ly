@@ -1,17 +1,35 @@
-import React from 'react'
-import SuggestionButton from '../ui/buttons/SuggestionButton'
+import React, { useEffect, useState } from "react";
+import { useNotebooks } from "../../../providers/NotebookProvider";
+import suggestionService from "../../../services/suggestionService";
+import SuggestionButton from "../ui/buttons/SuggestionButton";
 
 const SuggestionTab: React.FC = () => {
-  const header = 'timely-suggests.svg'
+  const { currentNotebook } = useNotebooks();
+  const [suggestion, setSuggestion] = useState<string>("Loading suggestion...");
 
-    return (
-        <div className='w-full h-full flex flex-col gap-2 items-start p-2'>
-            <img src={header} alt="noot" className='h-10 m-1 mx-2' />
-            <div className='w-full h-full flex flex-col gap-3 rounded-lg'>
-                <SuggestionButton message='Review notes today, then in 3 days—Noot will remind you!' />
-            </div>
-        </div>
-    )
-}
+  useEffect(() => {
+    const getSuggestion = async () => {
+      if (currentNotebook) {
+        try {
+          const result = await suggestionService.fetchNotebookSuggestion({
+            title: currentNotebook.title,
+            topics: currentNotebook.description || "",
+            mastery_goal: currentNotebook.mastery_goal || "",
+          });
+          setSuggestion(result);
+        } catch (error) {
+          setSuggestion("Could not fetch suggestion.");
+        }
+      }
+    };
+    getSuggestion();
+  }, [currentNotebook]);
 
-export default SuggestionTab
+  return (
+    <div className="p-4">
+      <SuggestionButton message={suggestion} />
+    </div>
+  );
+};
+
+export default SuggestionTab;

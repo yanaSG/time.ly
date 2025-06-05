@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.views import *
 from api.views import *
 from rest_framework_simplejwt.views import TokenRefreshView
@@ -51,6 +51,8 @@ urlpatterns = [
     path('api/notebooks/<int:notebook_id>/books/<int:pk>/download/', BookDownloadView.as_view(), name='document-download'),
     path('api/notebooks/<int:notebook_id>/books/<int:pk>/view/', BookViewInBrowser.as_view(), name='document-view'),
     path('api/notebooks/<int:notebook_id>/books/<int:pk>/summary/', BookSummaryDetailView.as_view(), name='document-summary-detail'),
+
+    path('api/', include('api.urls')),  
 ]
 
 if settings.DEBUG:

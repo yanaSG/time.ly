@@ -23,7 +23,8 @@ from .services.pdf_processor import ChapterProcessor
 import pdfplumber
 from django.db import transaction
 from dotenv import load_dotenv
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime, timezone
+import math
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -436,3 +437,88 @@ class BookSummaryDetailView(generics.RetrieveAPIView):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
+
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+
+class NotebookSuggestionView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        title = request.data.get("title")
+        topics = request.data.get("topics", "")
+        mastery_goal = request.data.get("mastery_goal")
+
+        # Calculate days left
+        try:
+            mastery_goal_clean = mastery_goal.rstrip('Z')
+            goal_date = datetime.fromisoformat(mastery_goal_clean)
+            if goal_date.tzinfo is None:
+                goal_date = goal_date.replace(tzinfo=timezone.utc)
+            now = datetime.now(timezone.utc)
+            delta = goal_date - now
+            days_left = max(1, math.ceil(delta.total_seconds() / (60 * 60 * 24)))
+        except Exception:
+            days_left = "unknown"
+
+        # Aggregate all summaries for all books in the notebook
+        book_summary = ""
+        notebook = Notebook.objects.filter(title=title, user=request.user).first()
+        if notebook:
+            summaries = []
+            books = Book.objects.filter(notebook=notebook)
+            for book in books:
+                summary = getattr(book, 'summary', None)
+                if summary and summary.markdown:
+                    summaries.append(summary.markdown)
+            book_summary = "\n\n".join(summaries)
+
+        prompt = (
+            f"You are a study coach. The user has a notebook titled '{title}'.\n"
+            f"The topics they need to master are: {topics}.\n"
+            f"Here is a summary of their material:\n{book_summary}\n"
+            f"They have {days_left} days left until their mastery goal.\n"
+            f"Create a daily study roadmap, assigning specific topics or subtopics to each day, "
+            f"based on the summary and topics above. Be specific and actionable. "
+            f"Format your response as a numbered day-by-day plan."
+        )
+
+        api_token = os.getenv("CHUTES_API_TOKEN")
+        print("Loaded CHUTES_API_TOKEN:", api_token)
+        if not api_token:
+            return Response({"error": "API token not found in environment."}, status=500)
+
+        headers = {
+            "Authorization": f"Bearer {api_token}",
+            "Content-Type": "application/json",
+        }
+        payload = {
+            "model": "deepseek-ai/DeepSeek-R1",
+            "messages": [
+                {"role": "system", "content": "You are a helpful study assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            "stream": False,
+            "max_tokens": 512,
+            "temperature": 0.7
+        }
+        try:
+            response = requests.post(
+                "https://llm.chutes.ai/v1/chat/completions",
+                headers=headers,
+                json=payload,
+                timeout=20
+            )
+            print("Chutes raw response:", response.text)
+            response.raise_for_status()
+            suggestion = response.json()["choices"][0]["message"]["content"]
+        except Exception as e:
+            logger.error(f"Chutes API error: {e}")
+            print("Chutes API error:", e)
+            suggestion = (
+                f"Review your notes today. With {days_left} days left until your goal, "
+                "focus on one key topic each day and test yourself regularly!"
+            )
+
+        # Only return the suggestion, not the summary
+        return Response({"suggestion": suggestion})
